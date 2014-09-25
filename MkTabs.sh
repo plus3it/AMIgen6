@@ -28,27 +28,33 @@ fi
 ##################################
 
 # Get the real mounts from the host's mtab
+(
 grep ${ALTROOT} ${AMIMTAB} | \
 sed -e '{
    /,bind /d
    s#'${ALTROOT}'#/#
    s#//#/#
-}' ## | sed '{
-##    /boot ext4/{N
-##       s/$/\n<TEMPDIR>/
-##    }
-## }') | sed 's/<TEMPDIR>/'${TMPSUB}'/' 
-## 
-## sed -n '/^[a-z]/p' /etc/mtab | \
-## sed '{
-##    /^none/d
-##    s/,rootcontext.*" / /
-## }' ) > ${ALTMTAB}
-## 
-## 
-## ## # Create chroot fstab from chroot mtab
-## ## awk '{printf("%s\t%s\t%s\t%s\t%s %s\n",$1,$2,$3,$4,$5,$6)}' ${ALTMTAB} | \
-## ## sed '{ 
-## ##    /^	/d
-## ##    /\/boot/s/^\/dev\/[a-z0-9]*/LABEL=\/boot/
-## ## }' > ${ALTROOT}/etc/fstab
+}' | sed '{
+   /boot ext4/{N
+      s/$/\n<TEMPDIR>/
+   }
+}' | sed 's/<TEMPDIR>/'${TMPSUB}'/' 
+
+# Get pseudo-mounts
+sed -n '/^[a-z]/p' ${AMIMTAB} | \
+sed '{
+   /^none/d
+   s/,rootcontext.*" / /
+}' ) |\
+sed '/^$/d' > ${ALTMTAB}
+
+
+# Create chroot fstab from chroot mtab
+awk '{printf("%s\t%s\t%s\t%s\t%s %s\n",$1,$2,$3,$4,$5,$6)}' ${ALTMTAB} | \
+sed '{ 
+   /^	/d
+   /\/boot/s/^\/dev\/[a-z0-9]*/LABEL=\/boot/
+   /LABEL=/{N
+      s/\n/&\/dev\/VolGroup00-swapVol	swap	swap	defaults	0 0&/
+  }
+}' > ${ALTROOT}/etc/fstab
