@@ -17,25 +17,31 @@ fi
 vgchange -a y VolGroup00
 
 # Mount chroot base device
+echo "Mounting /dev/VolGroup00/rootVol to /mnt/ec2-root"
 mount /dev/VolGroup00/rootVol /mnt/ec2-root/
 
 # Prep for next-level mounts
 mkdir /mnt/ec2-root/{var,opt,home,boot}
 
 # Mount the boot-root
-mount /dev/xvdl1 /mnt/ec2-root/boot/
+echo "Mounting ${BOOTDEV} to /mnt/ec2-root/boot"
+mount ${BOOTDEV} /mnt/ec2-root/boot/
 
 # Mount first of /var hierarchy
+echo "Mounting /dev/VolGroup00/varVol to /mnt/ec2-root/var"
 mount /dev/VolGroup00/varVol /mnt/ec2-root/var/
 
 # Prep next-level mountpoints
 mkdir -p /opt/ec2-root/var/{cache,log/{,audit},lock,lib/rpm}
 
 # Mount audit volume
+echo "Mounting /dev/VolGroup00/auditVol to /mnt/ec2-root/var/log/audit"
 mount /dev/VolGroup00/auditVol /mnt/ec2-root/var/log/audit
 
 # Mount the rest
+echo "Mounting /dev/VolGroup00/optVol to /mnt/ec2-root/opt"
 mount /dev/VolGroup00/optVol /mnt/ec2-root/opt/
+echo "Mounting /dev/VolGroup00/homeVol to /mnt/ec2-root/home"
 mount /dev/VolGroup00/homeVol /mnt/ec2-root/home/
 
 # Prep for loopback mounts
