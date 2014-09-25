@@ -6,9 +6,15 @@ INITARG=${1:-UNDEF}
 ROOTSSH="/root/.ssh"
 DLKEY=/tmp/EC2-key.pub
 
+# Informational messages
+function info_out() {
+   logger -t ec2.init -p kern.$1 "$2"
+   echo $2
+}
+
 # Error handler
 function err_out() {
-   echo $2
+   info_out error "$2"
    exit $1
 }
 
@@ -17,12 +23,12 @@ export PATH=:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
  
 start() {
   if [ ! -d ${ROOTSSH} ]; then
-    echo "No ${ROOTSSH} directory. Will try to create"
+    info_out warn "No ${ROOTSSH} directory. Will try to create"
     mkdir -p ${ROOTSSH} || err_out 1 "Failed to create ${ROOTSSH}"
     chmod 700 ${ROOTSSH} || err_out 1 "Failed to set permissions on ${ROOTSSH}"
   fi
   # Retrieve public key from metadata server using HTTP
-  echo "EC2: attempting to Retrieve public key from metadata server via HTTP." 
+  info_out info "EC2: attempting to Retrieve public key from metadata server via HTTP." 
   curl -f http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key > ${DLKEY} || err_out 1 "Key-grab FAILED"
 
   # What to do with the DL'ed key...
@@ -33,7 +39,7 @@ start() {
      if [ $? -eq 0 ]
      then
         # There is, but key's already present
-        echo "AWS key already present: nothing to do."
+        info_out info "AWS key already present: nothing to do."
         rm ${DLKEY}
      else
         # There isn't, so add it
@@ -48,7 +54,7 @@ start() {
 }
  
 stop() {
-  echo "Nothing to do here"
+  info_out info "Nothing to do here"
 }
  
 restart() {
