@@ -1,0 +1,6 @@
+CarveEBS.sh:		Configure attached EBS into target partitioning-state
+CleanChroot.sh:		Do some file cleanup...
+Install2Chroot.sh:	Install minimal RPM-set into chroot
+MkCfgFiles.sh:		Create storage config files within chroot
+MkChrootTree.sh:	Setup/mount chroot'ed volumes/partitions
+UmountChroot.sh:	Dismount and deactivate the chroot EBS
