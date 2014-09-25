@@ -47,8 +47,6 @@ sed '/^	/d' > ${ALTROOT}/etc/fstab
 ########################################
 ## <CREATE grub.conf AND menu.lst FILES>
 ########################################
-## THIS SECTION BROKEN. DIAGNOSING NOW ##
-#########################################
 
 # Get the chroot's kernel and initrd
 VMLINUZ=`find ${ALTBOOT} -name "vmlinuz*" | awk -F "/" '{ print $NF }'`
@@ -73,11 +71,15 @@ do
    fi
 done
 
+#############################################
+## THIS SECTION BROKEN. NEED BETTER METHOD ##
+#############################################
 # Refresh grub files
 ln ${ALTBOOT}/grub.conf ${ALTBOOT}/grub/grub.conf
 ln -s ${ALTBOOT}/grub.conf ${ALTBOOT}/menu.lst
 ln -s ${ALTBOOT}/grub/grub.conf ${ALTBOOT}/grub/menu.lst
 ln -s /boot/grub/grub.donf ${ALTROOT}/etc/grub.conf
+#############################################
 
 
 # Create stub network config scripts
@@ -89,3 +91,8 @@ ln -s /boot/grub/grub.donf ${ALTROOT}/etc/grub.conf
   echo "BOOTPROTO=dhcp"
   echo "ONBOOT=on"
   echo "IPV6INIT=no" ) > ${ALTROOT}/etc/sysconfig/network-scripts/ifcfg-eth0 
+
+# Make ssh relax about root logins
+( echo "UseDNS no"
+  echo "PermitRootLogin without-password" ) >> ${ALTROOT}/etc/ssh/sshd_config
+
