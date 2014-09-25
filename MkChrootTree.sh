@@ -1,64 +1,70 @@
 #!/bin/bash
 #
 # Setup/mount chroot'ed volumes/partitions
+# * Takes the dev-path hosting the /boot and LVM partitions as argument
 #
-##########################################
+#######################################################################
 CHROOTDEV=${1:-UNDEF}
 BOOTDEV=${CHROOTDEV}1
 LVMDEV=${CHROOTDEV}2
+ALTROOT="/mnt/ec2-root"
+
+function err_out() {
+   echo $2
+   exit $1
+}
 
 if [ ${CHROOTDEV} = "UNDEF" ]
 then
-   echo "Must supply name of device to use"
-   exit 1
+   err_out 1 "Must supply name of device to use (e.g., /dev/xvdg)"
 fi
 
 # Ensure all LVM volumes are active
-vgchange -a y VolGroup00
+vgchange -a y VolGroup00 || err_out 2 "Failed to activate LVM"
 
 # Mount chroot base device
-echo "Mounting /dev/VolGroup00/rootVol to /mnt/ec2-root"
-mount /dev/VolGroup00/rootVol /mnt/ec2-root/
+echo "Mounting /dev/VolGroup00/rootVol to ${ALTROOT}"
+mount /dev/VolGroup00/rootVol ${ALTROOT}/ || err_out 2 "Mount Failed"
 
 # Prep for next-level mounts
-mkdir /mnt/ec2-root/{var,opt,home,boot}
+mkdir -p ${ALTROOT}/{var,opt,home,boot} || err_out 3 "Mountpoint Create Failed"
 
 # Mount the boot-root
-echo "Mounting ${BOOTDEV} to /mnt/ec2-root/boot"
-mount ${BOOTDEV} /mnt/ec2-root/boot/
+echo "Mounting ${BOOTDEV} to ${ALTROOT}/boot"
+mount ${BOOTDEV} ${ALTROOT}/boot/ || err_out 2 "Mount Failed"
 
 # Mount first of /var hierarchy
-echo "Mounting /dev/VolGroup00/varVol to /mnt/ec2-root/var"
-mount /dev/VolGroup00/varVol /mnt/ec2-root/var/
+echo "Mounting /dev/VolGroup00/varVol to ${ALTROOT}/var"
+mount /dev/VolGroup00/varVol ${ALTROOT}/var/ || err_out 2 "Mount Failed"
 
 # Prep next-level mountpoints
-mkdir -p /opt/ec2-root/var/{cache,log/{,audit},lock,lib/rpm}
+mkdir -p ${ALTROOT}/var/{cache,log/{,audit},lock,lib/rpm}
 
 # Mount audit volume
-echo "Mounting /dev/VolGroup00/auditVol to /mnt/ec2-root/var/log/audit"
-mount /dev/VolGroup00/auditVol /mnt/ec2-root/var/log/audit
+echo "Mounting /dev/VolGroup00/auditVol to ${ALTROOT}/var/log/audit"
+mount /dev/VolGroup00/auditVol ${ALTROOT}/var/log/audit
 
 # Mount the rest
-echo "Mounting /dev/VolGroup00/optVol to /mnt/ec2-root/opt"
-mount /dev/VolGroup00/optVol /mnt/ec2-root/opt/
-echo "Mounting /dev/VolGroup00/homeVol to /mnt/ec2-root/home"
-mount /dev/VolGroup00/homeVol /mnt/ec2-root/home/
+echo "Mounting /dev/VolGroup00/optVol to ${ALTROOT}/opt"
+mount /dev/VolGroup00/optVol ${ALTROOT}/opt/
+echo "Mounting /dev/VolGroup00/homeVol to ${ALTROOT}/home"
+mount /dev/VolGroup00/homeVol ${ALTROOT}/home/
 
 # Prep for loopback mounts
-mkdir -p /mnt/ec2-root/{proc,sys,dev/{pts,shm}}
+mkdir -p ${ALTROOT}/{proc,sys,dev/{pts,shm}}
 
 # Create base dev-nodes
-mknod -m 600 /mnt/ec2-root/dev/console c 5 1
-mknod -m 666 /mnt/ec2-root/dev/null c 1 3
-mknod -m 666 /mnt/ec2-root/dev/zero c 1 5
-mknod -m 666 /mnt/ec2-root/dev/random c 1 8
-mknod -m 666 /mnt/ec2-root/dev/urandom c 1 9
-mknod -m 666 /mnt/ec2-root/dev/tty c 5 0
-mknod -m 666 /mnt/ec2-root/dev/ptmx c 5 2
-chown root:tty /mnt/ec2-root/dev/ptmx 
+mknod -m 600 ${ALTROOT}/dev/console c 5 1
+mknod -m 666 ${ALTROOT}/dev/null c 1 3
+mknod -m 666 ${ALTROOT}/dev/zero c 1 5
+mknod -m 666 ${ALTROOT}/dev/random c 1 8
+mknod -m 666 ${ALTROOT}/dev/urandom c 1 9
+mknod -m 666 ${ALTROOT}/dev/tty c 5 0
+mknod -m 666 ${ALTROOT}/dev/ptmx c 5 2
+chown root:tty ${ALTROOT}/dev/ptmx 
 
 # Do loopback mounts
-mount -o bind /proc /mnt/ec2-root/proc/
-mount -o bind /sys /mnt/ec2-root/sys/
-mount -o bind /dev/pts /mnt/ec2-root/dev/pts
-mount -o bind /dev/shm /mnt/ec2-root/dev/shm
+mount -o bind /proc ${ALTROOT}/proc/
+mount -o bind /sys ${ALTROOT}/sys/
+mount -o bind /dev/pts ${ALTROOT}/dev/pts
+mount -o bind /dev/shm ${ALTROOT}/dev/shm
