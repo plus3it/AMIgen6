@@ -1,3 +1,11 @@
+Current crop of scripts are very rudimentary: little in the way of
+error-handling, non-existent parameterization, etc. 
+
+		#####################
+		## USE AT OWN RISK ##
+		#####################
+
+
 CarveEBS.sh:		Configure attached EBS into target partitioning-state
 CleanChroot.sh:		Do some file cleanup...
 Install2Chroot.sh:	Install minimal RPM-set into chroot
