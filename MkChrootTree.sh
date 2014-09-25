@@ -3,6 +3,15 @@
 # Setup/mount chroot'ed volumes/partitions
 #
 ##########################################
+CHROOTDEV=${1:-UNDEF}
+BOOTDEV=${CHROOTDEV}1
+LVMDEV=${CHROOTDEV}2
+
+if [ ${CHROOTDEV} = "UNDEF" ]
+then
+   echo "Must supply name of device to use"
+   exit 1
+fi
 
 # Ensure all LVM volumes are active
 vgchange -a y VolGroup00
