@@ -47,6 +47,8 @@ sed '/^	/d' > ${ALTROOT}/etc/fstab
 ########################################
 ## <CREATE grub.conf AND menu.lst FILES>
 ########################################
+## THIS SECTION BROKEN. DIAGNOSING NOW ##
+#########################################
 
 # Get the chroot's kernel and initrd
 VMLINUZ=`find ${ALTBOOT} -name "vmlinuz*" | awk -F "/" '{ print $NF }'`
