@@ -1,0 +1,74 @@
+#!/bin/bash
+# chkconfig: 2345 95 20
+# processname: ec2-get-ssh
+# description: Capture AWS public key credentials for EC2 user
+INITARG=${1:-UNDEF}
+ROOTSSH="/root/.ssh"
+DLKEY=/tmp/EC2-key.pub
+
+# Error handler
+function err_out() {
+   echo $2
+   exit $1
+}
+
+# Replace the following environment variables for your system
+export PATH=:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
+ 
+start() {
+  if [ ! -d ${ROOTSSH} ]; then
+    echo "No ${ROOTSSH} directory. Will try to create"
+    mkdir -p ${ROOTSSH} || err_out 1 "Failed to create ${ROOTSSH}"
+    chmod 700 ${ROOTSSH} || err_out 1 "Failed to set permissions on ${ROOTSSH}"
+  fi
+  # Retrieve public key from metadata server using HTTP
+  echo "EC2: attempting to Retrieve public key from metadata server via HTTP." 
+  curl -f http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key > ${DLKEY} || err_out 1 "Key-grab FAILED"
+
+  # What to do with the DL'ed key...
+  if [ -s ${ROOTSSH}/authorized_keys ]
+  then
+     # See if there's an existing keyfile to append to
+     grep -q "`cat ${DLKEY}`" ${ROOTSSH}/authorized_keys
+     if [ $? -eq 0 ]
+     then
+        # There is, but key's already present
+        echo "AWS key already present: nothing to do."
+        rm ${DLKEY}
+     else
+        # There isn't, so add it
+        cat ${DLKEY} >> ${ROOTSSH}/authorized_keys
+        rm ${DLKEY}
+     fi
+  else
+     # No keyfile, so just move and permission the DL'ed key
+     mv ${DLKEY} ${ROOTSSH}/authorized_keys
+     chmod 600 ${ROOTSSH}/authorized_keys
+  fi
+}
+ 
+stop() {
+  echo "Nothing to do here"
+}
+ 
+restart() {
+  stop
+  start
+}
+ 
+# See how we were called.
+case ${INITARG} in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart)
+    restart
+    ;;
+  *)
+    err_out 1 "Usage: ${0} {start|stop|restart}"
+esac
+ 
+exit 0
