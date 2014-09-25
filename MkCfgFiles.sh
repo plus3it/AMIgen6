@@ -42,8 +42,10 @@ sed '{
 
 # Create chroot fstab from chroot mtab
 awk '{printf("%s\t%s\t%s\t%s\t%s %s\n",$1,$2,$3,$4,$5,$6)}' ${ALTMTAB} | \
-sed '/^	/d' > ${ALTROOT}/etc/fstab
-
+sed '{ 
+   /^	/d
+   /\/boot/s/^\/dev\/[a-z0-9]*/LABEL=\/boot/
+}' > ${ALTROOT}/etc/fstab
 ########################################
 ## <CREATE grub.conf AND menu.lst FILES>
 ########################################
@@ -76,9 +78,9 @@ done
 #############################################
 # Refresh grub files
 ln ${ALTBOOT}/grub.conf ${ALTBOOT}/grub/grub.conf
-ln -s ${ALTBOOT}/grub.conf ${ALTBOOT}/menu.lst
-ln -s ${ALTBOOT}/grub/grub.conf ${ALTBOOT}/grub/menu.lst
-ln -s /boot/grub/grub.donf ${ALTROOT}/etc/grub.conf
+(cd ${ALTBOOT} ; ln -s grub.conf menu.lst )
+(cd ${ALTBOOT}/grub ; ln -s grub.conf menu.lst )
+ln -s /boot/grub/grub.conf ${ALTROOT}/etc/grub.conf
 #############################################
 
 

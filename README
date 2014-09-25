@@ -5,10 +5,11 @@ error-handling, non-existent parameterization, etc.
 		## USE AT OWN RISK ##
 		#####################
 
+The scripts in this directory should be executed in the order listed.
 
 CarveEBS.sh:		Configure attached EBS into target partitioning-state
-CleanChroot.sh:		Do some file cleanup...
+MkChrootTree.sh:	Setup/mount chroot'ed volumes/partitions
 Install2Chroot.sh:	Install minimal RPM-set into chroot
 MkCfgFiles.sh:		Create storage config files within chroot
-MkChrootTree.sh:	Setup/mount chroot'ed volumes/partitions
+CleanChroot.sh:		Do some file cleanup...
 UmountChroot.sh:	Dismount and deactivate the chroot EBS
