@@ -27,7 +27,7 @@ echo "Mounting /dev/VolGroup00/rootVol to ${ALTROOT}"
 mount /dev/VolGroup00/rootVol ${ALTROOT}/ || err_out 2 "Mount Failed"
 
 # Prep for next-level mounts
-mkdir -p ${ALTROOT}/{var,opt,home,boot} || err_out 3 "Mountpoint Create Failed"
+mkdir -p ${ALTROOT}/{var,opt,home,boot,etc} || err_out 3 "Mountpoint Create Failed"
 
 # Mount the boot-root
 echo "Mounting ${BOOTDEV} to ${ALTROOT}/boot"
