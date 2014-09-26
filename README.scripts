@@ -1,0 +1,20 @@
+The scripts in this directory should be executed in the order listed.
+
+CarveEBS.sh:		Configure attached EBS into target partitioning-state.
+			ARGUMENT 1: dev-path to target disk
+MkChrootTree.sh:	Setup/mount chroot'ed volumes/partitions
+			ARGUMENT 1: dev-path to target disk
+MkTabs.sh:		Setup chroot's /etc/{fs,m}tab files (some RPMs in the
+			Install2Chroot complain if these files are missing
+			<no arguments>
+Install2Chroot.sh:	Install minimal RPM-set into chroot
+			<no arguments>
+MkCfgFiles.sh:		Create storage config files within chroot
+			<no arguments>
+MaintUser.sh:		Create unprivileged maintenance user
+			ARGUMENT 1: maintenance user accountname
+			ARGUMENT 1: maintenance user password
+CleanChroot.sh:		Do some file cleanup...
+			<no arguments>
+UmountChroot.sh:	Dismount and deactivate the chroot EBS
+			<no arguments>
