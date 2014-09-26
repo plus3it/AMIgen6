@@ -3,6 +3,7 @@
 # Install minimal RPM-set into chroot
 #
 #####################################
+CHROOT=${CHROOT:-/mnt/ec2-root}"
 CONFROOT=`dirname $0`
 
 # Install main RPM-groups
