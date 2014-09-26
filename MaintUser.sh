@@ -4,7 +4,7 @@
 #
 ########################################################################
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
-CHROOT=/mnt/ec2-root
+CHROOT=${CHROOT:-/mnt/ec2-root}
 USERNAME=${1:-awsmaint}
 PASSWORD=${2:-UNDEF}
 SUDOERF=/etc/sudoers.d/${USERNAME}

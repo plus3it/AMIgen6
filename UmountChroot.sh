@@ -3,7 +3,7 @@
 # Dismount and deactivate the chroot EBS
 #
 ########################################
-CHROOT=/mnt/ec2-root
+#CHROOT=${CHROOT:-/mnt/ec2-root}
 
 sync ; sync ;sync
 

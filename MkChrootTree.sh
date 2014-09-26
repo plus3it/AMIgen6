@@ -7,7 +7,7 @@
 CHROOTDEV=${1:-UNDEF}
 BOOTDEV=${CHROOTDEV}1
 LVMDEV=${CHROOTDEV}2
-ALTROOT="/mnt/ec2-root"
+ALTROOT="${CHROOT:-/mnt/ec2-root}"
 
 function err_out() {
    echo $2

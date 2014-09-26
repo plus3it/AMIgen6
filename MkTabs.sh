@@ -4,7 +4,7 @@
 #
 ###########################################
 AMIMTAB="/etc/mtab"
-ALTROOT="/mnt/ec2-root"
+ALTROOT="${CHROOT:-/mnt/ec2-root}"
 ALTMTAB="${ALTROOT}/etc/mtab"
 ALTBOOT="${ALTROOT}/boot"
 

@@ -3,6 +3,10 @@
 # Install minimal RPM-set into chroot
 #
 #####################################
+CONFROOT=`dirname $0`
 
-yum -c /opt/ec2/yum/yum-xen.conf --installroot=/mnt/ec2-root/ -y groupinstall core server-policy workstation-policy
-yum -c /opt/ec2/yum/yum-xen.conf --installroot=/mnt/ec2-root/ -y install kernel grub e2fsprogs lvm2 wget openssh-clients openssh-server dhclient selinux-policy selinux-policy-targeted vim-enhanced
+yum -c ${CONFROOT}/yum-build.conf --installroot=${CHROOT} -y groupinstall core \
+server-policy workstation-policy
+yum -c ${CONFROOT}/yum-build.conf --installroot=${CHROOT} -y install kernel \
+grub e2fsprogs lvm2 wget openssh-clients openssh-server dhclient \
+selinux-policy selinux-policy-targeted vim-enhanced
