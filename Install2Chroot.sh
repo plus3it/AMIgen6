@@ -5,8 +5,53 @@
 #####################################
 CONFROOT=`dirname $0`
 
-yum -c ${CONFROOT}/yum-build.conf --installroot=${CHROOT} -y groupinstall core \
-server-policy workstation-policy
+# Install main RPM-groups
+yum -c ${CONFROOT}/yum-build.conf --installroot=${CHROOT} -y groupinstall Base \
+Core Core
+
+# Install additional individual RPMs (dependencies pulled in automagically
 yum -c ${CONFROOT}/yum-build.conf --installroot=${CHROOT} -y install kernel \
-grub e2fsprogs lvm2 wget openssh-clients openssh-server dhclient \
-selinux-policy selinux-policy-targeted vim-enhanced
+acpid \
+aide \
+audit \
+dhclient \
+e2fsprogs \
+grub \
+lsb \
+lvm2 \
+man \
+ntp \
+ntpdate \
+openssh-clients \
+openssh-server \
+perl \
+rng-tools \
+rsync \
+rsyslog \
+selinux-policy \
+selinux-policy-targeted \
+sudo \
+telnet \
+unzip \
+vim-enhanced \
+wget \
+which \
+yum-cron \
+yum-utils 
+
+
+# Remove unwanted RPMs installed by the RPM groups
+yum -c ${CONFROOT}/yum-build.conf --installroot=${CHROOT} -y erase \
+abrt \
+abrt-addon-ccpp \
+abrt-addon-kerneloops \
+abrt-addon-python \
+abrt-cli \
+abrt-libs \
+gcc-gfortran \
+libvirt-client \
+libvirt-devel \
+libvirt-java \
+libvirt-java-devel \
+nc \
+sendmail
