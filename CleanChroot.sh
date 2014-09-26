@@ -3,10 +3,11 @@
 # Do some file cleanup...
 #
 #########################
-CHROOT=${CHROOT:/mnt/ec2}
+CHROOT=${CHROOT:-/mnt/ec2-root}
+CONFROOT=`dirname $0`
 
 # Get rid of stale RPM data
-yum -c /opt/ec2/yum/yum-xen.conf --installroot=${CHROOT}/ -y clean packages
+yum -c ${CONFROOT}/yum-build.conf --installroot=${CHROOT}/ -y clean packages
 rm -rf ${CHROOT}/var/cache/yum
 rm -rf ${CHROOT}/var/lib/yum
 
