@@ -100,4 +100,4 @@ ln -s /boot/grub/grub.conf ${ALTROOT}/etc/grub.conf
 
 # Ensure that SELinux contexts are up to date and mode dialed-back
 touch ${ALTROOT}/.autorelabel
-sed -i '/^SELINUX=/s/=.*/=permissive/' ${ALTROOT}/etc/sysconfig/selinux
+sed -i '/^SELINUX=/s/=.*/=permissive/' ${ALTROOT}/etc/selinux/config
