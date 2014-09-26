@@ -38,7 +38,7 @@ echo "Mounting /dev/VolGroup00/varVol to ${ALTROOT}/var"
 mount /dev/VolGroup00/varVol ${ALTROOT}/var/ || err_out 2 "Mount Failed"
 
 # Prep next-level mountpoints
-mkdir -p ${ALTROOT}/var/{cache,log/{,audit},lock,lib/rpm}
+mkdir -p ${ALTROOT}/var/{cache,log/{,audit},lock,lib/{,rpm},tmp}
 
 # Mount audit volume
 echo "Mounting /dev/VolGroup00/auditVol to ${ALTROOT}/var/log/audit"
