@@ -71,4 +71,4 @@ mkfs.ext4 -q -L /boot ${TARGET}1 && echo "Formatted ${TARGET}1 with ext4"
 lvchange -a y VolGroup00/swapVol
 
 # Format for use as swap
-mkswap /dev/VolGroup00/swapVol
+mkswap -f /dev/VolGroup00/swapVol
