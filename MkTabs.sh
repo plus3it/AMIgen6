@@ -57,4 +57,5 @@ sed '{
    /LABEL=/{N
       s/\n/&\/dev\/VolGroup00-swapVol	swap	swap	defaults	0 0&/
   }
-}' > ${ALTROOT}/etc/fstab
+}' | \
+sed '/mapper.*ext4/s/rw/defaults,acl/' > ${ALTROOT}/etc/fstab
