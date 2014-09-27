@@ -55,7 +55,7 @@ sed '{
    /^	/d
    /\/boot/s/^\/dev\/[a-z0-9]*/LABEL=\/boot/
    /LABEL=/{N
-      s/\n/&\/dev\/VolGroup00-swapVol	swap	swap	defaults	0 0&/
+      s/\n/&\/dev\/mapper\/VolGroup00-swapVol	swap	swap	defaults	0 0&/
   }
 }' | \
 sed '/mapper.*ext4/s/rw/defaults,acl/' > ${ALTROOT}/etc/fstab

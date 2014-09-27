@@ -32,4 +32,4 @@ CRYPTSTR=`openssl passwd -1 ${PASSWORD}`
 chroot ${CHROOT} useradd -G wheel -m -c "Maintenance User" -p "${CRYPTSTR}" "${USERNAME}" || err_out 1 "Failed to create user"
 
 # Create sudo rule
-printf "%%wheel\tALL=(root)\tALL\n" > ${CHROOT}/etc/sudoers.d/usr_${USERNAME} || err_out 1 "Failed to create sudoers entry."
+printf "%s\tALL=(root)\tALL\n" ${USERNAME} > ${CHROOT}/etc/sudoers.d/usr_${USERNAME} || err_out 1 "Failed to create sudoers entry."
