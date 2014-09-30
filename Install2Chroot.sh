@@ -7,7 +7,7 @@ CHROOT="${CHROOT:-/mnt/ec2-root}"
 CONFROOT=`dirname $0`
 
 # Install main RPM-groups
-yum -c ${CONFROOT}/yum-build.conf --installroot=${CHROOT} install -y @Base \
+yum -c ${CONFROOT}/yum-build.conf --nogpgcheck --installroot=${CHROOT} install -y @Base \
 @Core -- \
 kernel \
 acpid \
