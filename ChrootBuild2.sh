@@ -5,109 +5,45 @@
 ###########################################################################
 CHROOT="${CHROOT:-/mnt/ec2-root}"
 CONFROOT=`dirname $0`
+DATE=`/bin/date "+%Y%m%d-%H%M%S"`
+RMVLST="${CONFROOT}/remove.lst"
+YUMINVOKE="yum -c ${CONFROOT}/yum-build.conf --disablerepo=* --nogpgcheck --installroot=${CHROOT}"
+YUMLOG="/var/tmp/install2_log.${DATE}"
 
-# Install main RPM-groups
-yum -c ${CONFROOT}/yum-build.conf --nogpgcheck --installroot=${CHROOT} erase -y \
-aide \
-alsa-utils \
-b43-fwcutter \
-bind-libs \
-bind-utils \
-biosdevname \
-blktrace \
-bridge-utils \
-busybox \
-centos-indexhtml \
-ConsoleKit \
-ConsoleKit-libs \
-cpuspeed \
-crda \
-cryptsetup-luks \
-cryptsetup-luks-libs \
-cyrus-sasl-plain \
-dbus-python \
-desktop-file-utils \
-device-mapper-persistent-data \
-dmidecode \
-dmraid \
-dmraid-events \
-dosfstools \
-eggdbus \
-eject \
-elfutils-libs \
-fprintd \
-fprintd-pam \
-hal \
-hal-info \
-hal-libs \
-hdparm \
-hunspell \
-hunspell-en \
-irqbalance \
-iw \
-kexec-tools \
-kpartx \
-ledmon \
-libaio \
-libfprint \
-libjpeg-turbo \
-libnl \
-libpcap \
-libpciaccess \
-libusb1 \
-libxml2-python \
-lsof \
-man-pages \
-man-pages-overrides \
-mdadm \
-mesa-dri1-drivers \
-mesa-dri-filesystem \
-microcode_ctl \
-mlocate \
-mtr \
-nano \
-ntsysv \
-numactl \
-pam_passwdqc \
-parted \
-pciutils \
-pcmciautils \
-pinfo \
-pm-utils \
-polkit \
-prelink \
-psacct \
-python-ethtool \
-python-iwlib \
-qt3 \
-quota \
-rdate \
-readahead \
-redhat-lsb-compat \
-redhat-lsb-core \
-rfkill \
-scl-utils \
-setserial \
-setuptool \
-sg3_utils-libs \
-sgpio \
-smartmontools \
-sos \
-strace \
-sysstat \
-system-config-firewall-tui \
-system-config-network-tui \
-systemtap-runtime \
-tcpdump \
-tcp_wrappers \
-tcsh \
-traceroute \
-usbutils \
-usermode \
-vconfig \
-virt-what \
-wireless-tools \
-words \
-xdg-utils \
-yum-plugin-security \
-zip 
+logit() {
+   if [ $1 -ne 0 ]
+   then
+      printf -- "----------\nNote:%s\n----------\n" "$2" | tee -a ${YUMLOG}
+   else
+      echo "$2" | tee -a ${YUMLOG}
+   fi
+}
+
+# Grab our current RPM-manifest
+(chroot ${CHROOT} rpm -qa) > ${YUMLOG}.start
+RPMCNT=`wc -l ${YUMLOG}.start | cut -d " " -f 1`
+
+logit 0 "Started with ${RPMCNT} RPMs"
+
+# Iterate removal list and remove one at a time 
+for RPMCHK in `cat ${RMVLST}`
+do
+   ${YUMINVOKE} list -q -y installed ${RPMCHK} > /dev/null 2>&1
+   if [ $? -ne 0 ]
+   then
+      logit "1" "Package ${RPMCHK} not installed. Skipping removal attempt."
+   else
+      logit "0" "Attempting to remove ${RPMCHK}"
+      ${YUMINVOKE} -q -y erase ${RPMCHK} 2>&1 | \
+         sed '{
+            /listed more than once/d
+            /transaction-done/d
+         }' | tee -a ${YUMLOG}
+   fi
+done
+
+# Grab our final RPM-manifest
+(chroot ${CHROOT} rpm -qa) > ${YUMLOG}.end
+RPMCNT=`wc -l ${YUMLOG}.end | cut -d " " -f 1`
+
+logit 0 "Finished with ${RPMCNT} RPMs"
