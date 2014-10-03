@@ -8,7 +8,6 @@ foomatic-db
 foomatic-db-ppds
 ghostscript
 gtk2
-install.sh
 jasper-libs
 libdrm
 libjpeg-turbo
