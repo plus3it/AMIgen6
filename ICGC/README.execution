@@ -1,8 +1,0 @@
-Run scripts in following order:
-
-install.sh
-remove.sh
-icgc-affiliate-lockdown.sh
-# ClassificationUtility.sh	<- probably needs major rewrite
-
-The lockdown script will fail if the LVMs are not mounted with ACL mountopt.
