@@ -1,12 +1,13 @@
-parted
-lvm2
-e2fsprogs
-util-linux-ng
-coreutils
-sysvinit-tools
-sed
-gawk
-grep
-yum-utils
-grub
-openssl
+The following RPMs must be present in order for the AMI-creation scripts to function:
+* coreutils
+* e2fsprogs
+* gawk
+* grep
+* grub
+* lvm2
+* parted
+* sed
+* sysvinit-tools
+* openssl
+* util-linux-ng
+* yum-utils
