@@ -1,0 +1,12 @@
+parted
+lvm2
+e2fsprogs
+util-linux-ng
+coreutils
+sysvinit-tools
+sed
+gawk
+grep
+yum-utils
+grub
+openssl
