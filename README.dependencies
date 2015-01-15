@@ -11,3 +11,14 @@ The following RPMs must be present in order for the AMI-creation scripts to func
 * openssl
 * util-linux-ng
 * yum-utils
+With a @Core install, this should result in the following being installed:
+* lvm2
+  * lvm2-libs
+  * device-mapper
+    * device-mapper-event
+    * device-mapper-event-libs
+    * device-mapper-libs
+    * device-mapper-persistent-data
+  * libudev
+* parted
+* yum-utils
