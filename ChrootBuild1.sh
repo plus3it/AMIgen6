@@ -5,9 +5,10 @@
 #####################################
 CHROOT="${CHROOT:-/mnt/ec2-root}"
 CONFROOT=`dirname $0`
+REPODIS="--disablerepo=base --disablerepo=extras --disablerepo=updates"
 
 # Install main RPM-groups
-yum -c ${CONFROOT}/yum-build.conf --nogpgcheck --installroot=${CHROOT} install -y @Base \
+yum -c ${CONFROOT}/yum-build.conf --nogpgcheck ${REPODIS} --installroot=${CHROOT} install -y @Base \
 @Core -- \
 kernel \
 acpid \
