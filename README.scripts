@@ -29,3 +29,16 @@ CleanChroot.sh:		Do some file cleanup...
 			<no arguments>
 UmountChroot.sh:	Dismount and deactivate the chroot EBS
 			<no arguments>
+
+
+Note: If wanting to start over fresh with an EBS that's previously been used
+      to generate an AMI, it is desirable to completely blow away filesystem
+      and other structures from the installation-target disk. To do so:
+
+      1) Make LVM forget about any LVM objects related to the creation
+         of the chroot environment (e.g. `vgremove VolGroup00`)
+      2) Blow away the disk's current partition-table by executing:
+         `dd if=/dev/zero of=/dev/xvdf bs=1024 count=10`
+      3) Force kernel to re-read the disk's nulled-out partition-table:
+         `blockdev --rereadpt /dev/xvdf`
+
