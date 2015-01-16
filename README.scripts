@@ -22,11 +22,13 @@ MkCfgFiles.sh:		Create storage config files within chroot
 			<no arguments>
 MaintUser.sh:		Create unprivileged maintenance user
 			ARGUMENT 1: maintenance user accountname
-			ARGUMENT 1: maintenance user password
+			ARGUMENT 2: maintenance user password
 MkTabs.sh:		Something in the Chroot install seems to blow away
 			the fstab's swapVol entry. So, run this a second time.
 CleanChroot.sh:		Do some file cleanup...
 			<no arguments>
+HVMprep.sh:		Put GRUB into target EBS's MBR
+			ARGUMENT 1: dev-path to target disk
 UmountChroot.sh:	Dismount and deactivate the chroot EBS
 			<no arguments>
 
