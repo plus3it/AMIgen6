@@ -11,10 +11,10 @@ err_out() {
    exit ${1}
 }
 
-if [ "${TARGET}" = "UNDEF" ]
+if [ "${TARGDEV}" = "UNDEF" ]
 then
    err_out 1 "Failed to supply a target for setup. Aborting!"
-elif [ ! -b "${TARGET}" ]
+elif [ ! -b "${TARGDEV}" ]
 then
    err_out 2 "Device supplied not valid. Aborting!"
 else
