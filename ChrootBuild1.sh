@@ -8,23 +8,16 @@ CONFROOT=`dirname $0`
 REPODIS="--disablerepo=base --disablerepo=extras --disablerepo=updates"
 
 # Install main RPM-groups
-yum -c ${CONFROOT}/yum-build.conf --nogpgcheck ${REPODIS} --installroot=${CHROOT} install -y @Base -- \
-kernel \
-acpid \
-audit \
+yum -c ${CONFROOT}/yum-build.conf --nogpgcheck ${REPODIS} --installroot=${CHROOT} install -y @Core -- \
 cloud-init \
-dhclient \
-e2fsprogs \
-grub \
+kernel \
 lvm2 \
 man \
 ntp \
 ntpdate \
 openssh-clients \
-openssh-server \
 selinux-policy \
-selinux-policy-targeted \
-sudo \
+wget \
 yum-cron \
 yum-utils \
 -abrt \
