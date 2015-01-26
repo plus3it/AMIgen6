@@ -6,10 +6,15 @@
 CHROOT="${CHROOT:-/mnt/ec2-root}"
 TARGDEV="${1:-UNDEF}"
 
-if [ ${TARGET} = "UNDEF" ]
+err_out() {
+   echo "${2}" >&2
+   exit ${1}
+}
+
+if [ "${TARGET}" = "UNDEF" ]
 then
    err_out 1 "Failed to supply a target for setup. Aborting!"
-elif [ ! -b ${TARGET} ]
+elif [ ! -b "${TARGET}" ]
 then
    err_out 2 "Device supplied not valid. Aborting!"
 else
