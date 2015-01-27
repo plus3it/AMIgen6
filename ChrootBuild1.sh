@@ -9,6 +9,7 @@ REPODIS="--disablerepo=base --disablerepo=extras --disablerepo=updates"
 
 # Install main RPM-groups
 yum -c ${CONFROOT}/yum-build.conf --nogpgcheck ${REPODIS} --installroot=${CHROOT} install -y @Core -- \
+authconfig \
 cloud-init \
 kernel \
 lvm2 \
