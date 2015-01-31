@@ -60,7 +60,7 @@ default=0
 timeout=0
 title CentOS 6.5 (MTC AMI)
 	root (hd0,0)
-	kernel /${VMLINUZ} ro root=/dev/mapper/VolGroup00-rootVol crashkernel=auto LANG=en_US.UTF-8 KEYTABLE=us rd_NO_DM rd_NO_MD rd_LVM_LV=VolGroup00/rootVol rd_LVM_LV=VolGroup00/swapVol
+	kernel /${VMLINUZ} ro root=/dev/mapper/VolGroup00-rootVol crashkernel=auto LANG=en_US.UTF-8 KEYTABLE=us console=ttyS0 rd_NO_DM rd_NO_MD rd_LVM_LV=VolGroup00/rootVol rd_LVM_LV=VolGroup00/swapVol
 	initrd /${RAMDISK}
 EOF
 
