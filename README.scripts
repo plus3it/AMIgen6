@@ -10,13 +10,7 @@ MkTabs.sh:		Setup chroot's /etc/{fs,m}tab files (some RPMs in the
 			NOTE:	This script will fail with a sed error if the
 				AMI build host's /tmp is not its own mount
 				(preferably a tmpfs mountpoint)
-ChrootBuild1.sh:	Install initial, minimal RPM-set into chroot
-			<no arguments>
-ChrootBuild2.sh:	Remove extraneous RPMs from the prior  minimal RPM-set
-			installed into the chroot
-			<no arguments>
-ChrootBuild3.sh:	Install some RPMs into the chroot that were missed in
-			the prior two steps
+ChrootBuild.sh:		Install initial, minimal RPM-set into chroot
 			<no arguments>
 MkCfgFiles.sh:		Create storage config files within chroot
 			<no arguments>
