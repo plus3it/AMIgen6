@@ -2,7 +2,6 @@
 #
 ######################################################################
 PROGNAME=`basename ${0}`
-SPECCT=0
 
 OPTIONBUFR=`getopt -o v: --long volspec: -n ${PROGNAME} -- "$@"`
 # Note the quotes around '$OPTIONBUFR': they are essential!
@@ -76,6 +75,31 @@ done
 ## INSERT LOGIC TO DYNAMICALLY CREATE AND ATTACH A NEW EBS  
 ############################################################
 
+# Set this here so that getopt can have shifted through any flag-parms
+TARGET=${1}
+
+# Clear the MBR and partition table
+dd if=/dev/zero of=${TARGET} bs=512 count=1
+
+# Oh, parted, how I hate that you require me to do it all at once...
+parted -s ${TARGET} -- mklabel msdos mkpart primary ext4 2048s 500m \
+mkpart primary ext4 500m 100%s set 2 lvm on
+
+# Let's make sure that actually worked...
+if [ $? -ne 0 ]
+then
+   err_out 4 "Error during partitioning. Aborting!"
+fi
+
+# Format "/boot" target
+mkfs -t ext4 -L "/boot" ${TARGET}1
+
+# Set up LVM objects
+#   Note: we'll change this to formula based, later, to accommodate
+#         arbitrary EBS geometries
+vgcreate VolGroup00 ${TARGET}2 || err_out 5 "VG creation failed. Aborting!"
+
+
 # Parse Volume-array for disk-carving info
 for VOLSPEC in ${VOLSPECARRAY[*]}
 do
@@ -84,8 +108,14 @@ do
   MONTPNT=`echo ${VOLSPEC} | cut -d":" -f 3`
   if [ "${VOLSIZE}" = "100%FREE" ]
   then
-     echo "lvcreate -l ${VOLSIZE} -n ${VOLNAME} VolGroup00"
+     lvcreate -l ${VOLSIZE} -n ${VOLNAME} VolGroup00
   else
-     echo "lvcreate -L ${VOLSIZE} -n ${VOLNAME} VolGroup00"
+     lvcreate -L ${VOLSIZE} -n ${VOLNAME} VolGroup00
+  fi
+  if [ "${VOLNAME}" = "swapVol" ]
+  then
+     mkswap -f "/dev/VolGroup00/${VOLNAME}"
+  else
+     mkfs -t ext4 "/dev/VolGroup00/${VOLNAME}"
   fi
 done

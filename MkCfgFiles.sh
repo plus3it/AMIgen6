@@ -55,7 +55,7 @@ VMLINUZ=`find ${ALTBOOT} -name "vmlinuz*" | awk -F "/" '{ print $NF }'`
 RAMDISK=`find ${ALTBOOT} -name "initramfs*img" | awk -F "/" '{ print $NF }'`
 
 # Generate a grub.conf
-cat << EOF > ${ALTBOOT}/boot/grub.conf 
+cat << EOF > ${ALTBOOT}/grub/grub.conf 
 default=0
 timeout=0
 title CentOS 6.5 (MTC AMI)
