@@ -55,7 +55,7 @@ VMLINUZ=`find ${ALTBOOT} -name "vmlinuz*" | awk -F "/" '{ print $NF }'`
 RAMDISK=`find ${ALTBOOT} -name "initramfs*img" | awk -F "/" '{ print $NF }'`
 
 # Generate a grub.conf
-cat << EOF > ${ALTBOOT}/grub.conf 
+cat << EOF > ${ALTBOOT}/boot/grub.conf 
 default=0
 timeout=0
 title CentOS 6.5 (MTC AMI)
@@ -65,7 +65,7 @@ title CentOS 6.5 (MTC AMI)
 EOF
 
 # Kill older versions of grub files
-for FILE in ${ALTROOT}/etc/grub.conf ${ALTBOOT}/menu.lst ${ALTBOOT}/grub/grub.conf ${ALTBOOT}/grub/menu.lst
+for FILE in ${ALTROOT}/etc/grub.conf ${ALTBOOT}/menu.lst ${ALTBOOT}/grub/menu.lst
 do
    if [ -f ${FILE} ] || [ -L ${FILE} ]
    then
@@ -77,8 +77,6 @@ done
 ## THIS SECTION BROKEN. NEED BETTER METHOD ##
 #############################################
 # Refresh grub files
-ln ${ALTBOOT}/grub.conf ${ALTBOOT}/grub/grub.conf
-(cd ${ALTBOOT} ; ln -s grub.conf menu.lst )
 (cd ${ALTBOOT}/grub ; ln -s grub.conf menu.lst )
 ln -s /boot/grub/grub.conf ${ALTROOT}/etc/grub.conf
 #############################################
