@@ -12,11 +12,10 @@ MkTabs.sh:		Setup chroot's /etc/{fs,m}tab files (some RPMs in the
 				(preferably a tmpfs mountpoint)
 ChrootBuild.sh:		Install initial, minimal RPM-set into chroot
 			<no arguments>
+ChrootCfg.sh:		Perform supplementary configuration of components
+                        within ${CHROOT}
 MkCfgFiles.sh:		Create storage config files within chroot
 			<no arguments>
-MaintUser.sh:		Create unprivileged maintenance user
-			ARGUMENT 1: maintenance user accountname
-			ARGUMENT 2: maintenance user password
 MkTabs.sh:		Something in the Chroot install seems to blow away
 			the fstab's swapVol entry. So, run this a second time.
 CleanChroot.sh:		Do some file cleanup...
