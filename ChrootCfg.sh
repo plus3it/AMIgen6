@@ -17,7 +17,7 @@ mount -o bind /dev/shm ${CHROOT}/dev/shm
 mount -o bind /tmp ${CHROOT}/tmp
    
 # Ensure `ntpd` service is enabled and configured
-sed -e '/^ssh_pwauth/s/0$/1/' \
+sed -i -e '/^ssh_pwauth/s/0$/1/' \
     -e '/^ssh_pwauth/s/$/\n\ntimezone: UTC/' \
     /mnt/ec2-root/etc/cloud/cloud.cfg
 chroot ${CHROOT} /bin/sh -c "/sbin/chkconfig ntpd on 
