@@ -20,7 +20,7 @@ mount -o bind /tmp ${CHROOT}/tmp
 sed -i -e '/^ssh_pwauth/s/0$/1/' \
     -e '/^ssh_pwauth/s/$/\n\ntimezone: UTC/' \
     /mnt/ec2-root/etc/cloud/cloud.cfg
-chroot ${CHROOT} /bin/sh -c "/sbin/chkconfig ntpd on 
+chroot ${CHROOT} /bin/sh -c "/sbin/chkconfig ntpd on" 
 
 # Ensure that SELinux policy files are installed
 chroot ${CHROOT} /bin/sh -c "(rpm -q --scripts selinux-policy-targeted | \
