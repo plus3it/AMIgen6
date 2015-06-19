@@ -8,6 +8,18 @@
 #
 ####################################################################
 TARGET=${1:-UNDEF}
+ROOTVOL=${ROOTVOL:-rootVol}
+SWAPVOL=${SWAPVOL:-swapVol}
+VARVOL=${VARVOL:-varVol}
+LOGVOL=${LOGVOL:-logVol}
+AUDVOL=${AUDVOL:-auditVol}
+HOMEVOL=${HOMEVOL:-homeVol}
+ROOTVOLSZ=${ROOTVOLSZ:-4g}
+SWAPVOLSZ=${SWAPVOLSZ:-2g}
+VARVOLSZ=${VARVOLSZ:-2g}
+LOGVOLSZ=${LOGVOLSZ:-2g}
+AUDVOLSZ=${AUDVOLSZ:-100%FREE}
+HOMEVOLSZ=${HOMEVOLSZ:-1g}
 
 function err_out() {
    echo $2
@@ -43,12 +55,12 @@ fi
 #   Note: we'll change this to formula based, later, to accommodate
 #         arbitrary EBS geometries
 vgcreate VolGroup00 ${TARGET}2 || err_out 5 "VG creation failed. Aborting!"
-lvcreate -L 512M -n auditVol VolGroup00 || LVCSTAT=1
-lvcreate -L 512M -n optVol VolGroup00 || LVCSTAT=1
-lvcreate -L 2g -n rootVol VolGroup00 || LVCSTAT=1
-lvcreate -L 512M -n varVol VolGroup00 || LVCSTAT=1
-lvcreate -L 256M -n homeVol VolGroup00 || LVCSTAT=1
-lvcreate -L 2g -n swapVol VolGroup00 || LVCSTAT=1
+lvcreate -L ${ROOTVOLSZ} -n ${ROOTVOL} VolGroup00 || LVCSTAT=1
+lvcreate -L ${SWAPVOLSZ} -n ${SWAPVOL} VolGroup00 || LVCSTAT=1
+lvcreate -L ${HOMEVOLSZ} -n ${HOMEVOL} VolGroup00 || LVCSTAT=1
+lvcreate -L ${VARVOLSZ} -n ${VARVOL} VolGroup00 || LVCSTAT=1
+lvcreate -L ${LOGVOLSZ} -n ${LOGVOL} VolGroup00 || LVCSTAT=1
+lvcreate -l ${AUDVOLSZ} -n ${AUDVOL} VolGroup00 || LVCSTAT=1
 
 if [ "${LVCSTAT}" = "1" ]
 then

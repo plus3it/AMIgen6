@@ -10,19 +10,12 @@ MkTabs.sh:		Setup chroot's /etc/{fs,m}tab files (some RPMs in the
 			NOTE:	This script will fail with a sed error if the
 				AMI build host's /tmp is not its own mount
 				(preferably a tmpfs mountpoint)
-ChrootBuild1.sh:	Install initial, minimal RPM-set into chroot
+ChrootBuild.sh:		Install initial, minimal RPM-set into chroot
 			<no arguments>
-ChrootBuild2.sh:	Remove extraneous RPMs from the prior  minimal RPM-set
-			installed into the chroot
-			<no arguments>
-ChrootBuild3.sh:	Install some RPMs into the chroot that were missed in
-			the prior two steps
-			<no arguments>
+ChrootCfg.sh:		Perform supplementary configuration of components
+                        within ${CHROOT}
 MkCfgFiles.sh:		Create storage config files within chroot
 			<no arguments>
-MaintUser.sh:		Create unprivileged maintenance user
-			ARGUMENT 1: maintenance user accountname
-			ARGUMENT 2: maintenance user password
 MkTabs.sh:		Something in the Chroot install seems to blow away
 			the fstab's swapVol entry. So, run this a second time.
 CleanChroot.sh:		Do some file cleanup...

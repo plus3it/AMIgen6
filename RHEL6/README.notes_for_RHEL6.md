@@ -32,7 +32,7 @@ This cache will contain the following RPMs:
    ca-certificates
    checkpolicy
    chkconfig
-   cloud-init
+   cloud-init		(from Extras - may be in local customized repo)
    coreutils
    coreutils-libs
    cpio
@@ -295,6 +295,10 @@ This cache will contain the following RPMs:
    yum-utils
    zd1211-firmware
    zlib
+   python-simplejson	(from EPEL - may be in local customized repo)
+   python-requests	(from EPEL - may be in local customized repo)
+   python-ordereddict	(from EPEL - may be in local customized repo)
+
 ======================================================================
 The above RPM-list will support an Anaconda-type installation specification similar to:
    @Core -- \
@@ -323,3 +327,10 @@ The above RPM-list will support an Anaconda-type installation specification simi
    -libvirt-java-devel \
    -nc \
    -sendmail 
+
+==============================================================================
+After staging the RHEL 6 RPMs to the AMI-builder, invoke yum similar to the
+following to achieve a full install equivalent to a CentOS or SciLin chroot'ed
+install:
+   yum --disablerepo=* --nogpgcheck --installroot=/mnt/ec2-root/ \
+      localinstall /opt/repo-copy/*rpm
