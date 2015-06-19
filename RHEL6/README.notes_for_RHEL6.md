@@ -1,4 +1,16 @@
-Create a local cache of *all* of the following in order to be able to load an "@Core" package manifest and create an HVM-style instance or GRUB-bootable system.
+Creation of RHEL 6 AMIs requires slight alteration to the chroot-build process:
+* First, launch a license-included RHEL 6 AMI from the Amazon Marketplace. This instance will include access to all of the base and update RPMs and the components needed to provide access to those components within your AMI
+* First, within the launced, license-included instance, create a local cache of all of the RPMs required to perform the chroot-build of RHEL 6
+* Instead of executing the ChrootBuild1.sh step (outlined in the README.scripts file), execute:
+~~~
+yum --deisablerepo=* --enablerepo=build-cache --enablerepo=epel --nogpgcheck --installroot=${CHROOT} install -y
+~~~
+
+This directory includes a utility to automate the creation of the local RPM cache repository. The `LocalRepoSetup.sh` utility will download all of the RPMs necessary to crea an RHEL 6 AMI via the chroot-build process. The utility will also create the necessary data-structures to turn the downloaded RPMs into a yum-usable repository. Finally, the utility will create a repo-definition (in /etc/yum.repos.d) to make the cached RPMs usable via yum.
+
+The resultant cache will enable the AMI-creator to more-easily creat an AMI with an "@Core" type of package manifest. This will mean that the resultant Red Hat AMI will more-closely match the RPM manifest created by the reest of the AMI-creation tools used to create the standardized CentOS (or Scientific Linux) builds. 
+
+This cache will contain the following RPMs:
 ======================================================================
    acl
    aic94xx-firmware
