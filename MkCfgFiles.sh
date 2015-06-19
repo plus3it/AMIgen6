@@ -8,6 +8,8 @@ ALTROOT="${CHROOT:-/mnt/ec2-root}"
 ALTMTAB="${ALTROOT}/etc/mtab"
 ALTBOOT="${ALTROOT}/boot"
 
+RELCHK="/usr/bin/lsb_release"
+
 # Check if host AMI mounts /tmp as a (pseudo)filesystem
 mountpoint /tmp > /dev/null 2>&1
 if [ $? -eq 0 ]
@@ -15,6 +17,19 @@ then
    TMPSUB=""
 else
    TMPSUB="tmpfs /tmp tmpfs rw 0 0"
+fi
+
+if [ -x $CHROOT}/$RELCHK} ]
+then
+   OSTYPE=$((chroot ${CHROOT} ${RELCHK} -i) | cut -d ":" -f 2 | sed 's/^[ 	]*//')
+   OSTYPE=$((chroot ${CHROOT} ${RELCHK} -r) | cut -d ":" -f 2 | sed 's/^[ 	]*//')
+else
+   GETOSINFO=$(rpm -qf /etc/redhat-release --queryformat \
+      '%{vendor}:%{version}:${release}\n' | sed 's/\.el.*$//')
+   OSTYPE=$(echo ${GETOSINFO} | sut -d ":" -f 1)
+   OSMVER=$(echo ${GETOSINFO} | sut -d ":" -f 2)
+   OSSVER=$(echo ${GETOSINFO} | sut -d ":" -f 3)
+   OSVERS="${OSMVER}.${OSSVER}"
 fi
 
 ##################################
@@ -58,7 +73,7 @@ RAMDISK=`find ${ALTBOOT} -name "initramfs*img" | awk -F "/" '{ print $NF }'`
 cat << EOF > ${ALTBOOT}/grub/grub.conf 
 default=0
 timeout=0
-title CentOS 6.5 (MTC AMI)
+title ${OSTYPE} ${OSVERS} (MTC AMI)
 	root (hd0,0)
 	kernel /${VMLINUZ} ro root=/dev/mapper/VolGroup00-rootVol crashkernel=auto LANG=en_US.UTF-8 KEYTABLE=us console=ttyS0 rd_NO_DM rd_NO_MD rd_LVM_LV=VolGroup00/rootVol rd_LVM_LV=VolGroup00/swapVol
 	initrd /${RAMDISK}
