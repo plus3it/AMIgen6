@@ -5,20 +5,32 @@
 #########################
 CHROOT=${CHROOT:-/mnt/ec2-root}
 CONFROOT=`dirname $0`
+CLOUDCFG="$CHROOT/etc/cloud/cloud.cfg"
+MAINTUSR="maintuser"
 
 # Get rid of stale RPM data
-yum -c ${CONFROOT}/yum-build.conf --installroot=${CHROOT}/ -y clean packages
-rm -rf ${CHROOT}/var/cache/yum
-rm -rf ${CHROOT}/var/lib/yum
+chroot ${CHROOT} yum clean -y packages
+chroot ${CHROOT} rm -rf /var/cache/yum
+chroot ${CHROOT} rm -rf /var/lib/yum
 
 # Nuke any history data
 cat /dev/null > ${CHROOT}/root/.bash_history
 
-# Create AWS instance SSH key-grabber
-cp ec2-get-ssh.txt ${CHROOT}/etc/init.d/ec2-get-ssh 
+# Set TZ to UTC
+rm ${CHROOT}/etc/localtime
+cp ${CHROOT}/usr/share/zoneinfo/UTC ${CHROOT}/etc/localtime
 
-# Make it executable
-chmod 755 ${CHROOT}/etc/init.d/ec2-get-ssh 
+# Create maintuser
+CLINITUSR=$(grep -E "name: (centos|ec2-user|cloud-user)" ${CLOUDCFG} |
+   awk '{print $2}')
 
-# Activate the 'service'
-/usr/sbin/chroot ${CHROOT} /sbin/chkconfig ec2-get-ssh on
+if [ "${CLINITUSR}" = "" ]
+then
+   echo "Cannot reset value of cloud-init default-user" > /dev/stderr
+else
+   echo "Resetting default cloud-init user to ${MAINTUSR}"
+   sed -i '{
+      s/name: '${CLINITUSR}'/name: '${MAINTUSR}'/
+      /gecos:.*$/s/:.*/: Maintenance User/
+   }' ${CLOUDCFG}
+fi

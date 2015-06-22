@@ -26,7 +26,7 @@ then
    OSTYPE=$((chroot ${CHROOT} ${RELCHK} -r) | cut -d ":" -f 2 | \
       sed 's/^[ 	]*//')
 else
-   GETOSINFO=$(rpm -qf /etc/redhat-release --queryformat \
+   GETOSINFO=$(chroot ${CHROOT} rpm -qf /etc/redhat-release --queryformat \
       '%{vendor}:%{version}:%{release}\n' | sed 's/\.el.*$//')
    OSTYPE=$(echo ${GETOSINFO} | cut -d ":" -f 1)
    OSMVER=$(echo ${GETOSINFO} | cut -d ":" -f 2)
