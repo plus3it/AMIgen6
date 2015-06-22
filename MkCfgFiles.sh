@@ -19,16 +19,18 @@ else
    TMPSUB="tmpfs /tmp tmpfs rw 0 0"
 fi
 
-if [ -x $CHROOT}/$RELCHK} ]
+if [ -x ${CHROOT}/${RELCHK} ]
 then
-   OSTYPE=$((chroot ${CHROOT} ${RELCHK} -i) | cut -d ":" -f 2 | sed 's/^[ 	]*//')
-   OSTYPE=$((chroot ${CHROOT} ${RELCHK} -r) | cut -d ":" -f 2 | sed 's/^[ 	]*//')
+   OSTYPE=$((chroot ${CHROOT} ${RELCHK} -i) | cut -d ":" -f 2 | \
+      sed 's/^[ 	]*//')
+   OSTYPE=$((chroot ${CHROOT} ${RELCHK} -r) | cut -d ":" -f 2 | \
+      sed 's/^[ 	]*//')
 else
    GETOSINFO=$(rpm -qf /etc/redhat-release --queryformat \
-      '%{vendor}:%{version}:${release}\n' | sed 's/\.el.*$//')
-   OSTYPE=$(echo ${GETOSINFO} | sut -d ":" -f 1)
-   OSMVER=$(echo ${GETOSINFO} | sut -d ":" -f 2)
-   OSSVER=$(echo ${GETOSINFO} | sut -d ":" -f 3)
+      '%{vendor}:%{version}:%{release}\n' | sed 's/\.el.*$//')
+   OSTYPE=$(echo ${GETOSINFO} | cut -d ":" -f 1)
+   OSMVER=$(echo ${GETOSINFO} | cut -d ":" -f 2)
+   OSSVER=$(echo ${GETOSINFO} | cut -d ":" -f 3)
    OSVERS="${OSMVER}.${OSSVER}"
 fi
 
