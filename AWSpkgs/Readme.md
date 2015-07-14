@@ -42,17 +42,32 @@ Notes:
 * The `get_reference_source` is only relevant for the original AWS-hosted source-RPMs. It is provided in this bundle for completeness but is not otherwise usefully-functional
 * The Amazon python-boto RPM requires Python 2.7. This version is not compatible with current Enterprise Linux 6 derivatives.
 * Installation of these RPMs will pull in the following package-dependencies:
+  * alsa-lib
   * compat-readline5
+  * fontconfig
+  * freetype
   * giflib
   * java-1.8.0-openjdk
   * java-1.8.0-openjdk-headless
   * jpackage-utils
+  * libICE
+  * libSM
+  * libX11
+  * libX11-common
+  * libXau
+  * libXext
   * libXfont
+  * libXi
+  * libXrender
+  * libXtst
   * libfontenc
+  * libjpeg-turbo
+  * libpng
+  * libxcb
+  * rsync
   * ruby
   * ruby-libs
   * ttmkfdir
   * tzdata-java
   * xorg-x11-font-utils
   * xorg-x11-fonts-Type1
-
