@@ -35,6 +35,8 @@ After sorting through compatibility issues and creating RPMs, you will have the 
 * ec2-utils-0.4-1.22.el6.noarch.rpm
 * get_reference_source-1.2-0.4.el6.noarch.rpm
 
+Most of the AWS packages change fairly infrequently. It's recommended that the procedures noted at the head of this README be executed on approximately a quarterly-basis.
+
 Notes:
 * The `aws-cli` is not relevant to CentOS 6. It is recommended to get its functionality via the [install-bundle ZIP](http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
 * The `get_reference_source` is only relevant for the original AWS-hosted source-RPMs. It is provided in this bundle for completeness but is not otherwise usefully-functional
