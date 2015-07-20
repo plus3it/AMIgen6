@@ -9,14 +9,28 @@ BOOTDEV=${CHROOTDEV}1
 LVMDEV=${CHROOTDEV}2
 ALTROOT="${CHROOT:-/mnt/ec2-root}"
 
+# Generic logging outputter - extend to increase output destinations
 function err_out() {
    echo $2
    exit $1
 }
 
+# Can't do anything if we don't have an EBS to operate on
 if [ ${CHROOTDEV} = "UNDEF" ]
 then
    err_out 1 "Must supply name of device to use (e.g., /dev/xvdg)"
+fi
+
+if [ -d "${ALTROOT}" ]
+then
+   echo "Found ${ALTROOT}: proceeding..."
+elif [ -e "${ALTROOT}" ] && [ ! -d "${ALTROOT}" ]
+then
+   err_out 1 "Found ${ALTROOT} but it's not usable as mount-point"
+else
+   printf "Requested chroot [${ALTROOT}] not found. Attempting to create... "
+   install -d -m 0755 "${ALTROOT}" || err_out 1 "Failed to create ${ALTROOT}."
+   echo "Success!"
 fi
 
 # Ensure all LVM volumes are active
@@ -38,17 +52,15 @@ echo "Mounting /dev/VolGroup00/varVol to ${ALTROOT}/var"
 mount /dev/VolGroup00/varVol ${ALTROOT}/var/ || err_out 2 "Mount Failed"
 
 # Prep next-level mountpoints
-mkdir -p ${ALTROOT}/var/{cache,log,lock,lib/{,rpm},tmp}
-mount /dev/VolGroup00/logVol ${ALTROOT}/var/log || err_out 2 "Mount Failed"
+mkdir -p ${ALTROOT}/var/{cache,log/{,audit},lock,lib/{,rpm},tmp}
 
 # Mount audit volume
-mkdir -p ${ALTROOT}/var/log/audit
 echo "Mounting /dev/VolGroup00/auditVol to ${ALTROOT}/var/log/audit"
 mount /dev/VolGroup00/auditVol ${ALTROOT}/var/log/audit
 
 # Mount the rest
-## echo "Mounting /dev/VolGroup00/optVol to ${ALTROOT}/opt"
-## mount /dev/VolGroup00/optVol ${ALTROOT}/opt/
+echo "Mounting /dev/VolGroup00/optVol to ${ALTROOT}/opt"
+mount /dev/VolGroup00/optVol ${ALTROOT}/opt/
 echo "Mounting /dev/VolGroup00/homeVol to ${ALTROOT}/home"
 mount /dev/VolGroup00/homeVol ${ALTROOT}/home/
 
