@@ -2,7 +2,8 @@
 #
 # Script to automate and standardize installation of AWScli tools
 ############################################################
-
+SCRIPTROOT="$(dirname ${0})"
+CHROOT="${CHROOT:-/mnt/ec2-root}"
 AWSZIP=${1:-/tmp/awscli-bundle.zip}
 
 # Bail if bogus location for ZIP
@@ -21,10 +22,13 @@ fi
 cp -r /tmp/awscli-bundle ${CHROOT}/root
 
 # Install AWScli bundle into ${CHROOT}
-chroot ${CHROOT} /root/awscli-bundle/install -i /opt/AWScli -b /usr/bin/aws
+chroot ${CHROOT} /root/awscli-bundle/install -i /opt/aws -b /usr/bin/aws
 
 # Verify AWScli functionality within ${CHROOT}
 chroot ${CHROOT} /usr/bin/aws --version
 
 # Cleanup
 rm -rf ${CHROOT}/root/awscli-bundle
+
+# Install other AWS utilities to CHROOT
+yum --installroot=${CHROOT} install -y ${SCRIPTROOT}/AWSpkgs/*.noarch.rpm

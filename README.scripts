@@ -12,6 +12,9 @@ MkTabs.sh:		Setup chroot's /etc/{fs,m}tab files (some RPMs in the
 				(preferably a tmpfs mountpoint)
 ChrootBuild.sh:		Install initial, minimal RPM-set into chroot
 			<no arguments>
+AWScliSetup.sh:		Install AWS utilities (scripting tools and 
+                        optimized drivers for HVM instances)
+			<no arguments>
 ChrootCfg.sh:		Perform supplementary configuration of components
                         within ${CHROOT}
 MkCfgFiles.sh:		Create storage config files within chroot
