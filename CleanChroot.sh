@@ -34,3 +34,12 @@ else
       /gecos:.*$/s/:.*/: Maintenance User/
    }' ${CLOUDCFG}
 fi
+
+HASSUDO=$(grep -qw "sudo:" ${CLOUDCFG})$?
+if [[ ${HASSUDO} -eq 0 ]]
+then
+   echo "A sudoers line has already been defined within ${CLOUDCFG}"
+else
+   echo "A sudoers line has already been defined within ${CLOUDCFG}"
+   sed -i "/    name: ${MAINTUSR}/a\\      sudo: \[ 'ALL=(root) NOPASSWD:ALL' \]"
+fi   
