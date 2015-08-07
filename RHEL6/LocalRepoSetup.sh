@@ -67,6 +67,7 @@ fi
 
 # Create repo definition in ${YUMDIR}
 cat > ${YUMDIR}/${REPONAME}.repo <<EOF
+[${REPONAME}]
 name=Local Build-cache for AMI Chroot Install
 baseurl=file://${REPOROOT}
 enabled=0
