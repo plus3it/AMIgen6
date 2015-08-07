@@ -54,7 +54,7 @@ echo "=============================================================="
 yumdownloader --destdir=${REPOPKGS} --disablerepo=* --enablerepo=${EPELREPO} \
    `cat pkglist.epel`
 
-echo "Creating repo data-structures in ${REPODATA}
+echo "Creating repo data-structures in ${REPODATA}"
 createrepo -vvv ${REPOROOT}
 
 if [ -s ${REPODATA}/repomd.xml ]
