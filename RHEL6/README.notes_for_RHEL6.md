@@ -3,7 +3,7 @@ Creation of RHEL 6 AMIs requires slight alteration to the chroot-build process:
 * First, within the launced, license-included instance, create a local cache of all of the RPMs required to perform the chroot-build of RHEL 6
 * Instead of executing the ChrootBuild1.sh step (outlined in the README.scripts file), execute:
 ~~~
-yum --deisablerepo=* --enablerepo=build-cache --enablerepo=epel --nogpgcheck --installroot=${CHROOT} install -y
+yum --disablerepo=* --enablerepo=build-cache --enablerepo=epel --nogpgcheck --installroot=${CHROOT} install -y
 ~~~
 
 This directory includes a utility to automate the creation of the local RPM cache repository. The `LocalRepoSetup.sh` utility will download all of the RPMs necessary to crea an RHEL 6 AMI via the chroot-build process. The utility will also create the necessary data-structures to turn the downloaded RPMs into a yum-usable repository. Finally, the utility will create a repo-definition (in /etc/yum.repos.d) to make the cached RPMs usable via yum.

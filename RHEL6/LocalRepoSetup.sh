@@ -54,7 +54,7 @@ echo "=============================================================="
 yumdownloader --destdir=${REPOPKGS} --disablerepo=* --enablerepo=${EPELREPO} \
    `cat pkglist.epel`
 
-echo "Creating repo data-structures in ${REPODATA}
+echo "Creating repo data-structures in ${REPODATA}"
 createrepo -vvv ${REPOROOT}
 
 if [ -s ${REPODATA}/repomd.xml ]
@@ -67,6 +67,7 @@ fi
 
 # Create repo definition in ${YUMDIR}
 cat > ${YUMDIR}/${REPONAME}.repo <<EOF
+[${REPONAME}]
 name=Local Build-cache for AMI Chroot Install
 baseurl=file://${REPOROOT}
 enabled=0
