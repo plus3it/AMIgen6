@@ -12,6 +12,7 @@ The resultant cache will enable the AMI-creator to more-easily creat an AMI with
 The cache-creation script expects the presence of two file:
 * pkglst.rh
 * pkglist.epel
+
 This Git project does not contain prepopulated versions of these files. This desing decision was made due to differences in yum repository contents and names that may be available to the AMI build-personnel. It is expected that the person running the AMI generator scripts will populate these files by extracting the package lists from the Package*.md files in the project's parent directory. The easy method for generating these files is to do something like:
 ~~~
 awk '/\([CD])$/{ print $2}' Packages-*.md
