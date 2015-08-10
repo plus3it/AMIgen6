@@ -1,0 +1,16 @@
+# Firewall configuration written by system-config-firewall
+# Manual customization of this file is not recommended.
+*filter
+:INPUT DROP [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:LogBlock - [0:0]
+-A INPUT -m state --state RELATED,ESTABLISHED -m comment --comment "Allow related and established connections" -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -d 127.0.0.0/8 ! -i lo -j LogBlock
+-A INPUT -m state --state NEW -m tcp -p tcp -m comment --comment "Allow Secure SHell connections" --dport 22 -j ACCEPT
+-A INPUT -p icmp -m limit --limit 1/second -m comment --comment "Allow ICMP queries" -j ACCEPT
+-A FORWARD -j REJECT --reject-with icmp-host-prohibited
+-A LogBlock -m limit --limit 2/min -j LOG --log-prefix "IPFdrop: " --log-level 7
+-A LogBlock -j DROP
+COMMIT
