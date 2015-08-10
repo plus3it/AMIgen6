@@ -48,11 +48,14 @@ echo "Attempting to download mainline Red Hat RPMs to ${REPOPKGS}"
 echo "==========================================================="
 yumdownloader --destdir=${REPOPKGS} `cat pkglst.rh`
 
-echo "=============================================================="
-echo "Attempting to download EPEL (supplemental) RPMs to ${REPOPKGS}"
-echo "=============================================================="
-yumdownloader --destdir=${REPOPKGS} --disablerepo=* --enablerepo=${EPELREPO} \
-   `cat pkglist.epel`
+if [ -s pkglst.epel ]
+then
+   echo "=============================================================="
+   echo "Attempting to download EPEL (supplemental) RPMs to ${REPOPKGS}"
+   echo "=============================================================="
+   yumdownloader --destdir=${REPOPKGS} --disablerepo=* \
+      --enablerepo=${EPELREPO} `cat pkglst.epel`
+fi
 
 echo "Creating repo data-structures in ${REPODATA}"
 createrepo -vvv ${REPOROOT}
