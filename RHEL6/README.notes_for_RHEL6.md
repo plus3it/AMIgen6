@@ -1,7 +1,7 @@
 Creation of RHEL 6 AMIs requires slight alteration to the chroot-build process:
-* First, launch a license-included RHEL 6 AMI from the Amazon Marketplace. This instance will include access to all of the base and update RPMs and the components needed to provide access to those components within your AMI
-* First, within the launced, license-included instance, create a local cache of all of the RPMs required to perform the chroot-build of RHEL 6
-* Instead of executing the ChrootBuild1.sh step (outlined in the README.scripts file), execute:
+* First, launch a license-included RHEL 6 AMI from the Amazon Marketplace. This instance will include access to all of the base and update RPMs and the components needed to provide access to those components within your AMI. This will be your AMI-builder instance.
+* Next, from your AMI-builder instance, create a local cache of all of the RPMs required to perform the chroot-build of RHEL 6 (see note, below, about the `LocalRepoSetup.sh` utility)
+* After creating the localized RPM installation-cache, follow the the steps enumerated in this project's `README.scripts` file. When you reach the step where you would execute `ChrootBuild.sh` step (for CentOS or other public/free EL6 distributions), manually-execute, instead:
 ~~~
 yum --disablerepo=* --enablerepo=build-cache --enablerepo=epel --nogpgcheck --installroot=${CHROOT} install -y
 ~~~
