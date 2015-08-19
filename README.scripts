@@ -7,9 +7,14 @@ MkChrootTree.sh:	Setup/mount chroot'ed volumes/partitions
 MkTabs.sh:		Setup chroot's /etc/{fs,m}tab files (some RPMs in the
 			Install2Chroot complain if these files are missing
 			<no arguments>
-			NOTE:	This script will fail with a sed error if the
+			NOTE1:	This script will fail with a sed error if the
 				AMI build host's /tmp is not its own mount
 				(preferably a tmpfs mountpoint)
+			NOTE2:  This script will inherit the mount-options in
+			        place on the builder-host's /tmp filesystem.
+			        This can lead to unexpected behaviors in the
+			        resultant AMI if options like "noexec" or 
+			        "nosuid" have been used.
 ChrootBuild.sh:		Install initial, minimal RPM-set into chroot
 			<no arguments>
 
