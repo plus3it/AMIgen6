@@ -1,7 +1,7 @@
 In addition to the "Core" package group, the following packages will be needed to create an LVM2-enabled instance that is initially manageable from a remote host. RPMs denoted with "C" are directly-selected for install while RPMs denoted with "D" are installed to satisfy dependency-tracing for the "C" packages:
 
 * kernel (C): provides components necessary to boot a hardware virtual machine instance
-* lvm2(C): provides the components necessary to boot a VM with root operating-system components hosted on LVM2 data-structures
+* lvm2 (C): provides the components necessary to boot a VM with root operating-system components hosted on LVM2 data-structures
 * man (C): provides instance-local reference documentation
 * ntp (C): provides automated time-syncing functionality.
 * ntpdate (C): provides manual time-syncing functionality
