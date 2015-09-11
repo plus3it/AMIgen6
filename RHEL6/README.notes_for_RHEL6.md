@@ -11,11 +11,10 @@ This directory includes a utility to automate the creation of the local RPM cach
 The resultant cache will enable the AMI-creator to more-easily creat an AMI with an "@Core" type of package manifest. This will mean that the resultant Red Hat AMI will more-closely match the RPM manifest created by the reest of the AMI-creation tools used to create the standardized CentOS (or Scientific Linux) builds. 
 The cache-creation script expects the presence of two file:
 * pkglst.rh
-* pkglist.epel
+* pkglst.epel
 
-This Git project does not contain prepopulated versions of these files. This desing decision was made due to differences in yum repository contents and names that may be available to the AMI build-personnel. It is expected that the person running the AMI generator scripts will populate these files by extracting the package lists from the Package*.md files in the project's parent directory. The easy method for generating these files is to do something like:
-~~~
-awk '/\([CD])$/{ print $2}' Packages-*.md
-~~~
+This Git project does not contain prepopulated versions of these files. This desing decision was made due to differences in yum repository contents and names that may be available to the AMI build-personnel. If these files are missing at invocation of the repo-creation script, the script will create them by extracting the package lists from the Package*.md files in the project's parent directory.
 
-After generating the pkglst file(s) from the Packages-*.md files, the generated cache will contain ll of the RPMs enumerated in those files.
+If a different set of RPMs is desired, it will be required that the person seeking to generate the AMI create their own pkglst.rh and pkglst.epel files.
+
+The repo script will then create a local RPM cache from the RPMs specified in the pkglst.* files and create a repo-definition pointing to that local cache.
