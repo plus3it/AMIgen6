@@ -8,7 +8,9 @@
 REPOROOT=${1:-/opt/RHrepo}
 REPOPKGS=${REPOROOT}/Packages
 REPODATA=${REPOROOT}/repodata
+LAUNCHFROM=$(dirname $(readlink -f ${0}))
 EPELREPO="epel"
+EPELURL="https://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm"
 REPONAME=${2:-build-cache}
 YUMDIR="/etc/yum.repos.d"
 
@@ -43,19 +45,67 @@ do
    fi
 done
 
+# Make sure EPEL is defined
+if [[ $(yum repolist all | grep -qE "^${EPELREPO} ")$? -ne 0 ]]
+then
+   echo "No ${EPELREPO} repository defined: try to configure? [y/N] "
+   read ANSWER
+   case ${ANSWER} in
+      y|Y|yes|YES|Yes)
+         yum install -q -y ${EPELURL}
+         if [[ $? -eq 0 ]]
+         then
+            echo "Installed. Continuing"
+         else
+            echo "Failed. Aborting..." > /dev/stderr
+            exit 1
+         fi
+         ;;
+      *)
+         echo "Aborting..." > /dev/stderr
+         exit 1
+         ;;
+   esac
+fi
+
+# Check if Red Hat package list exists - create as necessary
+if [ ! -s ${LAUNCHFROM}/pkglst.rh ]
+then
+   for PKGFILE in Packages-Core.md Packages-MinExtra.md
+   do
+      cat ${LAUNCHFROM}/../${PKGFILE}
+   done | sed -n '{
+             /[CD])$/p
+             /[CD]):/p
+          }' | awk '{print $2}' > ${LAUNCHFROM}/pkglst.rh
+fi
+
+# Cache from package list
 echo "==========================================================="
 echo "Attempting to download mainline Red Hat RPMs to ${REPOPKGS}"
 echo "==========================================================="
-yumdownloader --destdir=${REPOPKGS} `cat pkglst.rh`
+yumdownloader --destdir=${REPOPKGS} $(< ${LAUNCHFROM}/pkglst.rh)
 
-if [ -s pkglst.epel ]
+# Check if EPEL package list exists - create as necessary
+if [ ! -s ${LAUNCHFROM}/pkglst.epel ]
 then
-   echo "=============================================================="
-   echo "Attempting to download EPEL (supplemental) RPMs to ${REPOPKGS}"
-   echo "=============================================================="
-   yumdownloader --destdir=${REPOPKGS} --disablerepo=* \
-      --enablerepo=${EPELREPO} `cat pkglst.epel`
+   sed -n '{
+      /[CD])$/p
+      /[CD]):/p
+   }' ${LAUNCHFROM}/../Packages-CloudInit.md | \
+   awk '{print $2}' > ${LAUNCHFROM}/pkglst.epel
+   echo "No EPEL package-list defined"
 fi
+
+# Cache from package list
+echo "=============================================================="
+echo "Attempting to download EPEL (supplemental) RPMs to ${REPOPKGS}"
+echo "=============================================================="
+yumdownloader --destdir=${REPOPKGS} --disablerepo=* \
+   --enablerepo=${EPELREPO} $(< ${LAUNCHFROM}/pkglst.epel)
+
+# Cache the AWS Red Hat repo configurators
+yumdownloader --destdir=${REPOPKGS} $(rpm -qa *rhui* --qf '%{name}\n')
 
 echo "Creating repo data-structures in ${REPODATA}"
 createrepo -vvv ${REPOROOT}
