@@ -80,12 +80,6 @@ then
           }' | awk '{print $2}' > ${LAUNCHFROM}/pkglst.rh
 fi
 
-# Cache from package list
-echo "==========================================================="
-echo "Attempting to download mainline Red Hat RPMs to ${REPOPKGS}"
-echo "==========================================================="
-yumdownloader --destdir=${REPOPKGS} $(< ${LAUNCHFROM}/pkglst.rh)
-
 # Check if EPEL package list exists - create as necessary
 if [ ! -s ${LAUNCHFROM}/pkglst.epel ]
 then
@@ -97,15 +91,10 @@ then
    echo "No EPEL package-list defined"
 fi
 
-# Cache from package list
-echo "=============================================================="
-echo "Attempting to download EPEL (supplemental) RPMs to ${REPOPKGS}"
-echo "=============================================================="
-yumdownloader --destdir=${REPOPKGS} --disablerepo=* \
-   --enablerepo=${EPELREPO} $(< ${LAUNCHFROM}/pkglst.epel)
-
-# Cache the AWS Red Hat repo configurators
-yumdownloader --destdir=${REPOPKGS} $(rpm -qa *rhui* --qf '%{name}\n')
+# Cache RPMs listed in pkglist files ...plus AWS RH RPM
+yumdownloader --destdir=${REPOPKGS} $(rpm -qa *rhui* --qf '%{name}\n') \
+  $(rpm -qf /etc/redhat-release --qf '%{name}\n') \
+  $(< ${LAUNCHFROM}/pkglst.rh) $(< ${LAUNCHFROM}/pkglst.epel)
 
 echo "Creating repo data-structures in ${REPODATA}"
 createrepo -vvv ${REPOROOT}
