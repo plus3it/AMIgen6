@@ -31,4 +31,23 @@ chroot ${CHROOT} /usr/bin/aws --version
 rm -rf ${CHROOT}/root/awscli-bundle
 
 # Install other AWS utilities to CHROOT
+BLDREG=$(curl -s \
+         http://169.254.169.254/latest/dynamic/instance-identity/document | \
+         awk -F":" '/region/{print $2}' | sed -e 's/",.*$//' -e 's/^.*"//')
+
+# If RedHat, stage a temp. RH yum-config
+if [[ $(rpm -qa | grep -q rhui)$? -eq 0 ]]
+then
+   sed 's/\.REGION\./.'${BLDREG}'./' /etc/yum.repos.d/redhat-rhui.repo > \
+     ${CHROOT}/etc/yum.repos.d/test.repo
+fi
+
 yum --installroot=${CHROOT} install -y ${SCRIPTROOT}/AWSpkgs/*.noarch.rpm
+
+# Nuke temp. RH yum-config if it exists
+if [ -e ${CHROOT}/etc/yum.repos.d/test.repo ]
+then
+   rm -f ${CHROOT}/etc/yum.repos.d/test.repo
+fi
+
+
