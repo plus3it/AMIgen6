@@ -94,7 +94,12 @@ fi
 # Cache RPMs listed in pkglist files ...plus AWS RH RPM
 yumdownloader --destdir=${REPOPKGS} $(rpm -qa *rhui* --qf '%{name}\n') \
   $(rpm -qf /etc/redhat-release --qf '%{name}\n') \
-  $(< ${LAUNCHFROM}/pkglst.rh) $(< ${LAUNCHFROM}/pkglst.epel)
+  $(< ${LAUNCHFROM}/pkglst.rh) $(< ${LAUNCHFROM}/pkglst.epel) \
+  yum-rhn-plugin rhn-setup rhn-client-tools rhnlib python-simplejson \
+  libxml2-python dbus-python rhnsd python-dmidecode python-gudev \
+  python-ethtool usermode m2crypto pyOpenSSL rhn-check libgudev1 pygobject2 \
+  libnl
+
 
 echo "Creating repo data-structures in ${REPODATA}"
 createrepo -vvv ${REPOROOT}
