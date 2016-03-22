@@ -1,86 +1,186 @@
 #!/bin/bash
 #
-# Configure attached EBS into target partitioning-state
+# Configure attached EBS into target partitioning-state. Script may
+# be used to carve disk into a simple "boot-n-root", 2-slice disk
+# or into a "boot+LVM2" 2-slice disk. LVM2 configuration-options are
+# currently limited.
 #
-#   Need to see if can automagically determine which disk to use via
-#   Fetchable attributes @  http://169.254.169.254/latest/meta-data/
-#   or via /opt/ec2/tools/bin commands. Until then, specify as argv.
+# Usage: 
+#   CarveEBS -b <bootlabel> -r <rootlabel>|-v <vgname> -d <devnode>
+#      -b|--bootlabel:
+#           FS-label applied to '/boot' filesystem
+#      -d|--disk:
+#           dev-path to disk to be partitioned
+#      -r|--rootlabel:
+#           FS-label to apply to '/' filesystem (no LVM in use)
+#      -v|--vgname:
+#           LVM2 Volume-Group name for root volumes
+#
+# Note: the "-r" and "-v" options are mutually exclusive
 #
 ####################################################################
-TARGET=${1:-UNDEF}
-ROOTVOL=${ROOTVOL:-rootVol}
-SWAPVOL=${SWAPVOL:-swapVol}
-VARVOL=${VARVOL:-varVol}
-LOGVOL=${LOGVOL:-logVol}
-AUDVOL=${AUDVOL:-auditVol}
-HOMEVOL=${HOMEVOL:-homeVol}
-ROOTVOLSZ=${ROOTVOLSZ:-4g}
-SWAPVOLSZ=${SWAPVOLSZ:-2g}
-VARVOLSZ=${VARVOLSZ:-2g}
-LOGVOLSZ=${LOGVOLSZ:-2g}
-AUDVOLSZ=${AUDVOLSZ:-100%FREE}
-HOMEVOLSZ=${HOMEVOLSZ:-1g}
+PROGNAME=$(basename "$0")
+BOOTDEVSZ="500m"
 
-function err_out() {
-   echo $2
+# Check for arguments
+if [[ $# -lt 1 ]]
+then
+   (
+    printf "Missing parameter(s). Valid flags/parameters are:\n" 
+    printf "\t-b|--bootlabel: FS-label applied to '/boot' filesystem\n"
+    printf "\t-d|--disk: dev-path to disk to be partitioned\n"
+    printf "\t-r|--rootlabel: FS-label to apply to '/' filesystem (no LVM in use)\n"
+    printf "\t-v|--vgname: LVM2 Volume-Group name for root volumes\n"
+    printf "Aborting...\n" 
+   ) > /dev/stderr
+   exit 1
+fi
+
+function LogBrk() {
+   echo $2 > /dev/stderr
    exit $1
 }
 
-if [ ${TARGET} = "UNDEF" ]
-then
-   err_out 1 "Failed to supply a target for setup. Aborting!"
-elif [ ! -b ${TARGET} ]
-then
-   err_out 2 "Device supplied not valid. Aborting!"
-else
-   BASEDEV=`basename ${TARGET}`
-   stat -t -c "%n" /sys/block/`basename ${TARGET}` > /dev/null 2>&1 || \
-      err_out 3 "Need the *base* devnode. Aborting!"
-fi
+# Partition as LVM 
+function CarveLVM() {
+   local ROOTVOL=(rootVol 4g)
+   local SWAPVOL=(swapVol 2g)
+   local HOMEVOL=(homeVol 1g)
+   local VARVOL=(varVol 2g)
+   local LOGVOL=(logVol 2g)
+   local AUDVOL=(auditVol 100%FREE)
 
-# Clear the MBR and partition table
-dd if=/dev/zero of=${TARGET} bs=512 count=1
+   # Clear the MBR and partition table
+   dd if=/dev/zero of=${CHROOTDEV} bs=512 count=1000 > /dev/null 2>&1
 
-# Oh, parted, how I hate that you require me to do it all at once...
-parted -s ${TARGET} -- mklabel msdos mkpart primary ext4 2048s 500m \
-mkpart primary ext4 500m 100%s set 2 lvm on
+   # Lay down the base partitions
+   parted -s ${CHROOTDEV} -- mklabel msdos mkpart primary ext4 2048s ${BOOTDEVSZ} \
+      mkpart primary ext4 ${BOOTDEVSZ} 100% set 2 lvm
 
-# Let's make sure that actually worked...
-if [ $? -ne 0 ]
-then
-   err_out 4 "Error during partitioning. Aborting!"
-fi
+   # Create LVM objects
+   vgcreate ${VGNAME} ${CHROOTDEV}2 || log_it 5 "VG creation failed. Aborting!"
+   lvcreate -L ${ROOTVOL[1]} -n ${ROOTVOL[0]} ${VGNAME} || LVCSTAT=1
+   lvcreate -L ${SWAPVOL[1]} -n ${SWAPVOL[0]} ${VGNAME} || LVCSTAT=1
+   lvcreate -L ${HOMEVOL[1]} -n ${HOMEVOL[0]} ${VGNAME} || LVCSTAT=1
+   lvcreate -L ${VARVOL[1]} -n ${VARVOL[0]} ${VGNAME} || LVCSTAT=1
+   lvcreate -L ${LOGVOL[1]} -n ${LOGVOL[0]} ${VGNAME} || LVCSTAT=1
+   lvcreate -l ${AUDVOL[1]} -n ${AUDVOL[0]} ${VGNAME} || LVCSTAT=1
 
-# Set up LVM objects
-#   Note: we'll change this to formula based, later, to accommodate
-#         arbitrary EBS geometries
-vgcreate VolGroup00 ${TARGET}2 || err_out 5 "VG creation failed. Aborting!"
-lvcreate -L ${ROOTVOLSZ} -n ${ROOTVOL} VolGroup00 || LVCSTAT=1
-lvcreate -L ${SWAPVOLSZ} -n ${SWAPVOL} VolGroup00 || LVCSTAT=1
-lvcreate -L ${HOMEVOLSZ} -n ${HOMEVOL} VolGroup00 || LVCSTAT=1
-lvcreate -L ${VARVOLSZ} -n ${VARVOL} VolGroup00 || LVCSTAT=1
-lvcreate -L ${LOGVOLSZ} -n ${LOGVOL} VolGroup00 || LVCSTAT=1
-lvcreate -l ${AUDVOLSZ} -n ${AUDVOL} VolGroup00 || LVCSTAT=1
+   # Create filesystems
+   mkfs -t ext4 -L "${BOOTLABEL}" ${CHROOTDEV}1
+   mkfs -t ext4 /dev/${VGNAME}/${ROOTVOL[0]}
+   mkfs -t ext4 /dev/${VGNAME}/${HOMEVOL[0]}
+   mkfs -t ext4 /dev/${VGNAME}/${VARVOL[0]}
+   mkfs -t ext4 /dev/${VGNAME}/${LOGVOL[0]}
+   mkfs -t ext4 /dev/${VGNAME}/${AUDVOL[0]}
+}
 
-if [ "${LVCSTAT}" = "1" ]
-then
-   echo "WARNING: one or more volume creations failed."
-fi   
+# Partition with no LVM
+function CarveBare() {
+   # Clear the MBR and partition table
+   dd if=/dev/zero of=${CHROOTDEV} bs=512 count=1000 > /dev/null 2>&1
 
-# TEMPORARILY turn off the swapVol volume
-lvchange -a n VolGroup00/swapVol
+   # Lay down the base partitions
+   parted -s ${CHROOTDEV} -- mklabel msdos mkpart primary ext4 2048s ${BOOTDEVSZ} \
+      mkpart primary ext4 ${BOOTDEVSZ} 100%
 
-# Iterate the volgroup for active volumes to format
-for VOL in /dev/VolGroup00/*
+   # Create FS on partitions
+   mkfs -t ext4 -L "${BOOTLABEL}" ${CHROOTDEV}1
+   mkfs -t ext4 -L "${ROOTLABEL}" ${CHROOTDEV}2
+}
+
+
+
+######################
+## Main program-flow
+######################
+OPTIONBUFR=`getopt -o b:d:r:v: --long bootlabel:,disk:,rootlabel:,vgname: -n ${PROGNAME} -- "$@"`
+
+eval set -- "${OPTIONBUFR}"
+
+###################################
+# Parse contents of ${OPTIONBUFR}
+###################################
+while [ true ]
 do
-   mkfs.ext4 -q ${VOL} && echo "Formatted ${VOL} with ext4"
+   case "$1" in
+      -b|--bootlabel)
+	    case "$2" in
+	       "")
+	          LogBrk 1 "Error: option required but not specified"
+	          shift 2;
+	          exit 1
+	          ;;
+	       *)
+               BOOTLABEL=${2}
+	          shift 2;
+	       ;;
+	    esac
+	    ;;
+      -d|--disk)
+	    case "$2" in
+	       "")
+	          LogBrk 1 "Error: option required but not specified"
+	          shift 2;
+	          exit 1
+	          ;;
+	       *)
+               CHROOTDEV=${2}
+	          shift 2;
+	       ;;
+	    esac
+	    ;;
+      -r|--rootlabel)
+	    case "$2" in
+	       "")
+	          LogBrk 1"Error: option required but not specified"
+	          shift 2;
+	          exit 1
+	          ;;
+	       *)
+               ROOTLABEL=${2}
+	          shift 2;
+	       ;;
+	    esac
+	    ;;
+      -v|--vgname)
+	    case "$2" in
+	       "")
+	          LogBrk 1 "Error: option required but not specified"
+	          shift 2;
+	          exit 1
+	          ;;
+	       *)
+               VGNAME=${2}
+	          shift 2;
+	       ;;
+	    esac
+	    ;;
+      --)
+         shift
+         break
+         ;;
+      *)
+         LogBrk 1 "Internal error!"
+         exit 1
+         ;;
+   esac
 done
 
-# Format (and label) boot partition
-mkfs.ext4 -q -L /boot ${TARGET}1 && echo "Formatted ${TARGET}1 with ext4"
-
-# Retun swapVol to service
-lvchange -a y VolGroup00/swapVol
-
-# Format for use as swap
-mkswap -f /dev/VolGroup00/swapVol
+# Abort if no bootlabel was set
+if [[ -z ${BOOTLABEL+xxx} ]]
+then
+   LogBrk 1 "Cannot continue without 'bootlabel' being specified. Aborting..."
+# Abort if mutually-exclusive options were declared
+elif [[ ! -z ${ROOTLABEL+xxx} ]] && [[ ! -z ${VGNAME+xxx} ]]
+then
+   LogBrk 1 "The 'rootlabel' and 'vgname' arguments are mutually exclusive. Exiting."
+# Partion for LVM
+elif [[ -z ${ROOTLABEL+xxx} ]] && [[ ! -z ${VGNAME+xxx} ]]
+then
+   CarveLVM
+# Partition for bare slices
+elif [[ ! -z ${ROOTLABEL+xxx} ]] && [[ -z ${VGNAME+xxx} ]]
+then
+   CarveBare
+fi
