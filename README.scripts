@@ -1,7 +1,18 @@
 The scripts in this directory should be executed in the order listed.
 
 CarveEBS.sh:		Configure attached EBS into target partitioning-state.
-			ARGUMENT 1: dev-path to target disk
+			Honors the flags:
+                          -b|--bootlabel:
+                             FS-label applied to '/boot' filesystem
+                          -d|--disk:
+                             dev-path to disk to be partitioned
+                          -r|--rootlabel:
+                             FS-label to apply to '/' filesystem (no LVM in use)
+                          -v|--vgname:
+                             LVM2 Volume-Group name for root volumes
+                         Note: the "-r" and "-v" options are mutually exclusive
+
+
 MkChrootTree.sh:	Setup/mount chroot'ed volumes/partitions
 			ARGUMENT 1: dev-path to target disk
 MkTabs.sh:		Setup chroot's /etc/{fs,m}tab files (some RPMs in the
