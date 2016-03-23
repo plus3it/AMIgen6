@@ -54,10 +54,12 @@ then
 fi
 
 # Ensure that SELinux policy files are installed
+printf "Applying SELinux policies to chroot..."
 chroot ${CHROOT} /bin/sh -c "(rpm -q --scripts selinux-policy-targeted | \
    sed -e '1,/^postinstall scriptlet/d' | \
    sed -e '1i #!/bin/sh') > /tmp/selinuxconfig.sh ; \
    sh /tmp/selinuxconfig.sh 1"
+echo
 
 # Return chroot()'s dev-tree to PVM state
 umount ${CHROOT}/tmp
