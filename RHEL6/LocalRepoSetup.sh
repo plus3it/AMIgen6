@@ -48,7 +48,7 @@ done
 # Make sure EPEL is defined
 if [[ $(yum repolist all | grep -qE "^${EPELREPO} ")$? -ne 0 ]]
 then
-   echo "No ${EPELREPO} repository defined: try to configure? [y/N] "
+   printf "No ${EPELREPO} repository defined: try to configure? [y/n] "
    read ANSWER
    case ${ANSWER} in
       y|Y|yes|YES|Yes)
@@ -60,6 +60,9 @@ then
             echo "Failed. Aborting..." > /dev/stderr
             exit 1
          fi
+         ;;
+      n|N|no|NO|No)
+         echo "Skipping EPEL setup"
          ;;
       *)
          echo "Aborting..." > /dev/stderr
@@ -92,8 +95,10 @@ then
 fi
 
 # Cache RPMs listed in pkglist files ...plus AWS RH RPM
-yumdownloader --destdir=${REPOPKGS} $(rpm -qa *rhui* --qf '%{name}\n') \
+yumdownloader --resolve --destdir=${REPOPKGS} \
+  $(rpm -qa *rhui* --qf '%{name}\n') \
   $(rpm -qf /etc/redhat-release --qf '%{name}\n') \
+  $(rpm -qf /etc/yum.repos.d/* --qf '%{name}\n' | grep -v cache | sort -u) \
   $(< ${LAUNCHFROM}/pkglst.rh) $(< ${LAUNCHFROM}/pkglst.epel) \
   yum-rhn-plugin rhn-setup rhn-client-tools rhnlib python-simplejson \
   libxml2-python dbus-python rhnsd python-dmidecode python-gudev \
