@@ -32,7 +32,7 @@ fi
 # Nuke the re-lable file
 if [[ -f ${CHROOT}/.autorelabel ]]
 then
-   rm ${CHROOT}/.autorelabel && "Nuked ${CHROOT}/.autorelabel" || \
+   rm ${CHROOT}/.autorelabel && echo "Nuked ${CHROOT}/.autorelabel" || \
       fatal "Failed to nuke ${CHROOT}/.autorelabel. AMI will relabel on first-boot"
 fi
 
