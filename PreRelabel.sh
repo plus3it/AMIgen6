@@ -38,5 +38,5 @@ fi
 
 # Relabel the chroot-env
 printf "Relabeling the chroot env... "
-chroot $CHROOT /sbin/fixfiles relabel && echo "Success!" || \
+chroot $CHROOT /sbin/fixfiles -f relabel && echo "Success!" || \
    fatal "Operation may have failed."
