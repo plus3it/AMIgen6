@@ -38,7 +38,7 @@ sed -e '{
    /boot ext4/{N
       s/$/\n<TEMPDIR>/
    }
-}' | sed 's/<TEMPDIR>/'${TMPSUB}'/' 
+}' | sed "s#<TEMPDIR>#${TMPSUB}#"
 
 # Get pseudo-mounts
 sed -n '/^[a-z]/p' ${AMIMTAB} | \
