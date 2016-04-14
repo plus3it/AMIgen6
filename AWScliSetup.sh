@@ -4,13 +4,17 @@
 #
 # This script assumes standard AWS-hosted location for the
 # CLI ZIP-file. It may be overridden by passing a URI as
-# the lone argument to the script
+# the first argument to the script.
+#
+# For the second argument, provide the url to the epel-release
+# package, or it will default to one publicly available.
 #
 ############################################################
 SCRIPTROOT="$(dirname ${0})"
 CHROOT="${CHROOT:-/mnt/ec2-root}"
 BUNDLE="awscli-bundle.zip"
 ZIPSRC="${1:-https://s3.amazonaws.com/aws-cli}"
+EPELRELEASE="${2:-https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm}"
 AWSZIP="/tmp/${BUNDLE}"
 
 # Bail if bogus location for ZIP
@@ -48,4 +52,5 @@ rm -rf ${CHROOT}/root/awscli-bundle
 # Depending on RPMs dependencies, this may fail if a repo is
 # missing (e.g. EPEL). Will also fail if no RPMs are present
 # in the search directory.
+yum --installroot=${CHROOT} install -y ${EPELRELASE}
 yum --installroot=${CHROOT} install -y ${SCRIPTROOT}/AWSpkgs/*.noarch.rpm
