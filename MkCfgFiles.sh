@@ -11,15 +11,6 @@ ALTBOOT="${ALTROOT}/boot"
 
 RELCHK="/usr/bin/lsb_release"
 
-# Check if host AMI mounts /tmp as a (pseudo)filesystem
-mountpoint /tmp > /dev/null 2>&1
-if [ $? -eq 0 ]
-then
-   TMPSUB=""
-else
-   TMPSUB="tmpfs /tmp tmpfs rw 0 0"
-fi
-
 if [ -x ${CHROOT}/${RELCHK} ]
 then
    OSTYPE=$((chroot ${CHROOT} ${RELCHK} -i) | cut -d ":" -f 2 | \
@@ -35,35 +26,6 @@ else
    OSVERS="${OSMVER}.${OSSVER}"
 fi
 
-##################################
-## Create chroot'ed /etc/mtab file
-##################################
-# Start with parent AMI's mount-tab...
-(
-(ALTROOT="/mnt/ec2-root" grep ${ALTROOT} /etc/mtab | \
-sed -e '{
-   /,bind /d
-   s#'${ALTROOT}'#/#
-   s#//#/#
-}' | sed '{
-   /boot ext4/{N
-      s/$/\n<TEMPDIR>/
-   }
-}') | sed 's/<TEMPDIR>/'${TMPSUB}'/' 
-
-sed -n '/^[a-z]/p' /etc/mtab | \
-sed '{
-   /^none/d
-   s/,rootcontext.*" / /
-}' ) > ${ALTMTAB}
-
-
-# Create chroot fstab from chroot mtab
-awk '{printf("%s\t%s\t%s\t%s\t%s %s\n",$1,$2,$3,$4,$5,$6)}' ${ALTMTAB} | \
-sed '{ 
-   /^	/d
-   /\/boot/s/^\/dev\/[a-z0-9]*/LABEL=\/boot/
-}' > ${ALTROOT}/etc/fstab
 ########################################
 ## <CREATE grub.conf AND menu.lst FILES>
 ########################################
@@ -91,13 +53,9 @@ do
    fi
 done
 
-#############################################
-## THIS SECTION BROKEN. NEED BETTER METHOD ##
-#############################################
 # Refresh grub files
-(cd ${ALTBOOT}/grub ; ln -s grub.conf menu.lst )
-ln -s /boot/grub/grub.conf ${ALTROOT}/etc/grub.conf
-#############################################
+chroot $CHROOT /bin/bash -c "cd /boot/grub ; ln -s grub.conf menu.lst"
+chroot $CHROOT /bin/bash -c "ln -s /boot/grub/grub.conf /etc/grub.conf"
 
 
 # Create stub network config scripts
