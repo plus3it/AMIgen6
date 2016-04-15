@@ -7,11 +7,14 @@
 #
 #################################################################
 CHROOT="${CHROOT:-/mnt/ec2-root}"
+LOGGERFACILITY="local0"
+LOGGERLEVEL="crit"
+LOGGEROUT="${LOGGERFACILITY}.${LOGGERLEVEL}"
 
 # Emit error message and exit
 function fatal() {
    echo "${1}" > /dev/stderr
-   logger -p local0 -t AMIbuilder "${1}"
+   logger -p ${LOGGEROUT} -t AMIbuilder "${1}"
    exit
 }
 
