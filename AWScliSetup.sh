@@ -13,6 +13,18 @@ BUNDLE="awscli-bundle.zip"
 ZIPSRC="${1:-https://s3.amazonaws.com/aws-cli}"
 AWSZIP="/tmp/${BUNDLE}"
 
+# Make sure the AMZN.Linux packages are present
+if [[ $(test -f ${SCRIPTROOT}/AWSpkgs/*.noarch.rpm)$? -ne 0 ]]
+then
+   (
+    echo "AMZN.Linux packages not found in ${SCRIPTROOT}/AWSpkgs"
+    echo "Please download missing RPMs before proceeding."
+    echo "Note: GetAmznLx.sh may be used to do this for you."
+    echo "Aborting..."
+   ) > /dev/stderr
+   exit 1
+fi
+
 # Bail if bogus location for ZIP
 printf "Fetching ${BUNDLE} from ${ZIPSRC}..."
 (cd /tmp ; curl -sL "${ZIPSRC}/${BUNDLE}" -o ${BUNDLE})
