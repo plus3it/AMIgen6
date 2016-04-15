@@ -5,7 +5,7 @@
 #####################################
 CHROOT="${CHROOT:-/mnt/ec2-root}"
 CONFROOT=`dirname $0`
-REPODIS="--disablerepo=* --enablerepo='chroot-*'"
+REPODIS="--disablerepo=* --enablerepo=chroot-*"
 
 # Install main RPM-groups
 yum -c ${CONFROOT}/yum-build.conf --nogpgcheck ${REPODIS} --installroot=${CHROOT} install -y @Core -- \
