@@ -21,25 +21,21 @@ rm ${CHROOT}/etc/localtime
 cp ${CHROOT}/usr/share/zoneinfo/UTC ${CHROOT}/etc/localtime
 
 # Create maintuser
-CLINITUSR=$(grep -E "name: (centos|ec2-user|cloud-user)" ${CLOUDCFG} |
-   awk '{print $2}')
+CLINITUSR=$(grep -E "name: (maintuser|centos|ec2-user|cloud-user)" \
+            ${CLOUDCFG} | awk '{print $2}')
 
 if [ "${CLINITUSR}" = "" ]
 then
    echo "Cannot reset value of cloud-init default-user" > /dev/stderr
 else
-   echo "Resetting default cloud-init user to ${MAINTUSR}"
+   echo "Setting default cloud-init user to ${MAINTUSR}"
    sed -i '{
-      s/name: '${CLINITUSR}'/name: '${MAINTUSR}'/
-      /gecos:.*$/s/:.*/: Maintenance User/
+      /default_user:/,/distro:/d
    }' ${CLOUDCFG}
+   sed -i '{
+      /^system_info:/{N
+         s/\n/&  default_user:\n    name: maintuser\n    lock_passwd: true\n    gegos: Maintenance User\n    groups: \[wheel, adm\]\n    sudo: \["ALL=(root) NOPASSWD:ALL"\]\n    shell: \/bin\/bash\n  distro: rhel\n/
+      }
+   }'  ${CLOUDCFG}
 fi
 
-HASSUDO=$(grep -qw "sudo:" ${CLOUDCFG})$?
-if [[ ${HASSUDO} -eq 0 ]]
-then
-   echo "A sudoers line has already been defined within ${CLOUDCFG}"
-else
-   echo "A sudoers line has already been defined within ${CLOUDCFG}"
-   sed -i "/    name: ${MAINTUSR}/a\\      sudo: \[ 'ALL=(root) NOPASSWD:ALL' \]"
-fi   
