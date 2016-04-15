@@ -83,5 +83,6 @@ chown root:tty ${ALTROOT}/dev/ptmx
 # Do loopback mounts
 mount -o bind /proc ${ALTROOT}/proc/
 mount -o bind /sys ${ALTROOT}/sys/
+mount -o bind /selinux ${ALTROOT}/selinux/
 mount -o bind /dev/pts ${ALTROOT}/dev/pts
 mount -o bind /dev/shm ${ALTROOT}/dev/shm
