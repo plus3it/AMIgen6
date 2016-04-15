@@ -7,8 +7,23 @@ CHROOT="${CHROOT:-/mnt/ec2-root}"
 CONFROOT=`dirname $0`
 REPODIS="--disablerepo=* --enablerepo=chroot-*"
 
+function PrepChroot() {
+   if [[ ! -e ${CHROOT}/etc/init.d ]]
+   then
+      ln -s ${CHROOT}/etc/rc.d/init.d  ${CHROOT}/etc/init.d
+   fi
+
+   yumdownloader --destdir=/tmp $(rpm -qf /etc/redhat-release)
+   yumdownloader --destdir=/tmp $(rpm --qf '%{name}\n' \
+      -qf /etc/yum.repos.d/* | sort -u)
+   rpm --root ${CHROOT} --initdb
+   rpm --root ${CHROOT} -ivh --nodeps /tmp/*.rpm
+}
+
+PrepChroot
+
 # Install main RPM-groups
-yum -c ${CONFROOT}/yum-build.conf --nogpgcheck ${REPODIS} --installroot=${CHROOT} install -y @Core -- \
+yum --nogpgcheck --installroot=${CHROOT} install -y @Core -- \
 $(rpm --qf '%{name}\n' -qf /etc/yum.repos.d/* | sort -u) \
 authconfig \
 cloud-init \
