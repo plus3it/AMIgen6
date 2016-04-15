@@ -18,7 +18,8 @@ EPELRELEASE="${2:-https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.no
 AWSZIP="/tmp/${BUNDLE}"
 
 # Make sure the AMZN.Linux packages are present
-if [[ $(test -f ${SCRIPTROOT}/AWSpkgs/*.noarch.rpm)$? -ne 0 ]]
+AMZNRPMS=($( stat -c '%n' ${SCRIPTROOT}/AWSpkgs/*noarch.rpm))
+if [[ ${#AMZNRPMS[@]} -eq 0 ]]
 then
    (
     echo "AMZN.Linux packages not found in ${SCRIPTROOT}/AWSpkgs"
@@ -64,5 +65,6 @@ rm -rf ${CHROOT}/root/awscli-bundle
 # Depending on RPMs dependencies, this may fail if a repo is
 # missing (e.g. EPEL). Will also fail if no RPMs are present
 # in the search directory.
-yum --installroot=${CHROOT} install -y ${EPELRELASE}
+yum install -y ${EPELRELEASE}
+yum --installroot=${CHROOT} install -y ${EPELRELEASE}
 yum --installroot=${CHROOT} install -y ${SCRIPTROOT}/AWSpkgs/*.noarch.rpm
