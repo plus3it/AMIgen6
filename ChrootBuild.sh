@@ -10,7 +10,7 @@ REPODIS="--disablerepo=* --enablerepo=chroot-*"
 function PrepChroot() {
    if [[ ! -e ${CHROOT}/etc/init.d ]]
    then
-      ln -s ${CHROOT}/etc/rc.d/init.d  ${CHROOT}/etc/init.d
+      ln -t ${CHROOT}/etc -s rc.d/init.d
    fi
 
    yumdownloader --destdir=/tmp $(rpm -qf /etc/redhat-release)
