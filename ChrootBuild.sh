@@ -5,9 +5,10 @@
 #####################################
 CHROOT="${CHROOT:-/mnt/ec2-root}"
 CONFROOT=`dirname $0`
-REPODIS="--disablerepo=* --enablerepo=chroot-*"
 
 function PrepChroot() {
+   local DISABLEREPOS="*media*,*epel*,C*-*"
+
    if [[ ! -e ${CHROOT}/etc/init.d ]]
    then
       ln -t ${CHROOT}/etc -s rc.d/init.d
@@ -18,6 +19,8 @@ function PrepChroot() {
       -qf /etc/yum.repos.d/* | sort -u)
    rpm --root ${CHROOT} --initdb
    rpm --root ${CHROOT} -ivh --nodeps /tmp/*.rpm
+   yum --enablerepo=* --disablerepo=${DISABLEREPOS} --installroot=${CHROOT} \
+      -y reinstall $(rpm --qf '%{name}\n' -qf /etc/yum.repos.d/* | sort -u)
 }
 
 PrepChroot
