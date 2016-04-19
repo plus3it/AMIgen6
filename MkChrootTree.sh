@@ -68,7 +68,7 @@ echo "Mounting /dev/VolGroup00/homeVol to ${ALTROOT}/home"
 mount /dev/VolGroup00/homeVol ${ALTROOT}/home/
 
 # Prep for loopback mounts
-mkdir -p ${ALTROOT}/{proc,sys,dev/{pts,shm}}
+mkdir -p ${ALTROOT}/{proc,sys,dev/{pts,shm},selinux}
 
 # Create base dev-nodes
 mknod -m 600 ${ALTROOT}/dev/console c 5 1
