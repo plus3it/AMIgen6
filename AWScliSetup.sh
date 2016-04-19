@@ -48,7 +48,7 @@ else
 fi
 
 # Unzip the AWScli bundle into /tmp
-(cd /tmp ; unzip ${AWSZIP})
+(cd /tmp ; unzip -o ${AWSZIP})
 
 # Copy the de-archived zip to ${CHROOT}
 cp -r /tmp/awscli-bundle ${CHROOT}/root
