@@ -9,7 +9,7 @@ CLOUDCFG="$CHROOT/etc/cloud/cloud.cfg"
 MAINTUSR="maintuser"
 
 # Get rid of stale RPM data
-chroot ${CHROOT} yum clean -y packages
+chroot ${CHROOT} yum clean --enablerepo=* -y packages
 chroot ${CHROOT} rm -rf /var/cache/yum
 chroot ${CHROOT} rm -rf /var/lib/yum
 
