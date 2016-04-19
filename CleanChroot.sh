@@ -29,13 +29,21 @@ then
    echo "Cannot reset value of cloud-init default-user" > /dev/stderr
 else
    echo "Setting default cloud-init user to ${MAINTUSR}"
-   sed -i '{
-      /default_user:/,/distro:/d
-   }' ${CLOUDCFG}
-   sed -i '{
-      /^system_info:/{N
-         s/\n/&  default_user:\n    name: maintuser\n    lock_passwd: true\n    gegos: Maintenance User\n    groups: \[wheel, adm\]\n    sudo: \["ALL=(root) NOPASSWD:ALL"\]\n    shell: \/bin\/bash\n  distro: rhel\n/
-      }
-   }'  ${CLOUDCFG}
+sed -i '/^system_info/,/^  ssh_svcname/d' ${CLOUDCFG}
+sed -i '/syntax=yaml/i\
+system_info:\
+  default_user:\
+    name: maintuser\
+    lock_passwd: true\
+    gecos: Local Maintenance User\
+    groups: [wheel, adm]\
+    sudo: ["ALL=(root) NOPASSWD:ALL"]\
+    shell: /bin/bash\
+  distro: rhel\
+  paths:\
+    cloud_dir: /var/lib/cloud\
+    templates_dir: /etc/cloud/templates\
+  ssh_svcname: sshd\
+' ${CLOUDCFG}
 fi
 
