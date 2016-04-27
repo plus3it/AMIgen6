@@ -8,6 +8,9 @@ CONFROOT=`dirname $0`
 CLOUDCFG="$CHROOT/etc/cloud/cloud.cfg"
 MAINTUSR="maintuser"
 
+# Disable EPEL repos
+chroot ${CHROOT} yum-config-manager --disable "*epel*" > /dev/null
+
 # Get rid of stale RPM data
 chroot ${CHROOT} yum clean --enablerepo=* -y packages
 chroot ${CHROOT} rm -rf /var/cache/yum
