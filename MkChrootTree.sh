@@ -83,6 +83,17 @@ chown root:tty ${ALTROOT}/dev/ptmx
 # Do loopback mounts
 mount -o bind /proc ${ALTROOT}/proc/
 mount -o bind /sys ${ALTROOT}/sys/
-mount -o bind /selinux ${ALTROOT}/selinux/
+
+# This shouldn't be necessary...
+if [[ ! -d ${ALTROOT}/selinux ]]
+then
+   mkdir ${ALTROOT}/selinux || (\
+      printf "Unable to create missing ${ALTROOT}/selinux "
+      printf "Bind-mount of selinux pseudo-filesystem will "
+      printf "likely fail"
+   ) > /dev/stderr
+fi
+mount -o bind /selinux ${ALTROOT}/selinux
+
 mount -o bind /dev/pts ${ALTROOT}/dev/pts
 mount -o bind /dev/shm ${ALTROOT}/dev/shm
