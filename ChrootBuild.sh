@@ -6,6 +6,7 @@
 PROGNAME=$(basename "$0")
 CHROOT="${CHROOT:-/mnt/ec2-root}"
 CONFROOT=$(dirname $0)
+RPMSTAGE="/tmp/RPMstage"
 
 function PrepChroot() {
    local DISABLEREPOS="*media*,*epel*,C*-*"
@@ -15,18 +16,23 @@ function PrepChroot() {
       ln -t ${CHROOT}/etc -s rc.d/init.d
    fi
 
-   # Assume standard repodefs if nothing defined
-   if [[ -z ${REPORPM+xxx} ]]
-   then
-      yumdownloader --destdir=/tmp $(rpm --qf '%{name}\n' -qf /etc/redhat-release)
-      yumdownloader --destdir=/tmp $(rpm --qf '%{name}\n' \
-         -qf /etc/yum.repos.d/* 2> /dev/null | sort -u)
-   fi
+   # Get 'vendor' repos from parent AMI
+   yumdownloader --destdir=${RPMSTAGE} $(
+      rpm --qf '%{name}\n' -qf /etc/redhat-release
+   )
+   yumdownloader --destdir=${RPMSTAGE} $(
+      rpm --qf '%{name}\n' -qf /etc/yum.repos.d/* | \
+      grep -v "not owned" | sort -u
+   )
 
+   # Install 'vendor' repos to build-root
    rpm --root ${CHROOT} --initdb
-   rpm --root ${CHROOT} -ivh --nodeps /tmp/*.rpm
+   rpm --root ${CHROOT} -ivh --nodeps ${RPMSTAGE}/*.rpm
    yum --enablerepo=* --disablerepo=${DISABLEREPOS} --installroot=${CHROOT} \
-      -y reinstall $(rpm --qf '%{name}\n' -qf /etc/yum.repos.d/* | sort -u)
+      -y reinstall $(
+         rpm --qf '%{name}\n' -qf /etc/yum.repos.d/* | \
+         grep -v "not owned" | sort -u
+      )
 
    # if alt-repo defined, disable everything, then install alt-repo
    if [[ ! -z ${REPORPM+xxx} ]]
