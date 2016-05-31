@@ -15,9 +15,14 @@ function PrepChroot() {
       ln -t ${CHROOT}/etc -s rc.d/init.d
    fi
 
-   yumdownloader --destdir=/tmp $(rpm --qf '%{name}\n' -qf /etc/redhat-release)
-   yumdownloader --destdir=/tmp $(rpm --qf '%{name}\n' \
-      -qf /etc/yum.repos.d/* 2> /dev/null | sort -u)
+   # Assume standard repodefs if nothing defined
+   if [[ -z ${REPORPM+xxx} ]]
+   then
+      yumdownloader --destdir=/tmp $(rpm --qf '%{name}\n' -qf /etc/redhat-release)
+      yumdownloader --destdir=/tmp $(rpm --qf '%{name}\n' \
+         -qf /etc/yum.repos.d/* 2> /dev/null | sort -u)
+   fi
+
    rpm --root ${CHROOT} --initdb
    rpm --root ${CHROOT} -ivh --nodeps /tmp/*.rpm
    yum --enablerepo=* --disablerepo=${DISABLEREPOS} --installroot=${CHROOT} \
