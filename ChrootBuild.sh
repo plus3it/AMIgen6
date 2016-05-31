@@ -15,7 +15,7 @@ function PrepChroot() {
       ln -t ${CHROOT}/etc -s rc.d/init.d
    fi
 
-   yumdownloader --destdir=/tmp $(rpm -qf /etc/redhat-release)
+   yumdownloader --destdir=/tmp $(rpm --qf '%{name}\n' -qf /etc/redhat-release)
    yumdownloader --destdir=/tmp $(rpm --qf '%{name}\n' \
       -qf /etc/yum.repos.d/* 2> /dev/null | sort -u)
    rpm --root ${CHROOT} --initdb
