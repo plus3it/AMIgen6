@@ -56,7 +56,7 @@ function PrepChroot() {
 ######################
 
 # See if we'e passed any valid flags
-OPTIONBUFR=$(getopt -o r: --long repouri: -n ${PROGNAME} -- "$@")
+OPTIONBUFR=$(getopt -o r:b: --long repouri:bonusrepos: -n ${PROGNAME} -- "$@")
 eval set -- "${OPTIONBUFR}"
 
 while [[ true ]]
@@ -75,6 +75,19 @@ do
 	       ;;
 	 esac
 	 ;;
+      -b|--bonusrepos)
+         case "$2" in
+	    "")
+	       echo "Error: option required but not specified" > /dev/stderr
+	       shift 2;
+	       exit 1
+	       ;;
+	    *)
+	       BONUSREPO=${2}
+	       shift 2;
+	       ;;
+	 esac
+	 ;;
       --)
          shift
 	 break
@@ -89,9 +102,14 @@ done
 # Stage useable repo-defs into $CHROOT/etc/yum.repos.d
 PrepChroot
 
+if [[ ! -z ${BONUSREPO+xxx} ]]
+then
+   ENABREPO="--enablerepo=${BONUSREPO}"
+fi
+
 # Install main RPM-groups
-yum --nogpgcheck --installroot=${CHROOT} install -y @Core -- \
-$(rpm --qf '%{name}\n' -qf /etc/yum.repos.d/* | sort -u) \
+yum --nogpgcheck --installroot=${CHROOT} "${ENABREPO}" install -y @Core -- \
+$(rpm --qf '%{name}\n' -qf /etc/yum.repos.d/* | grep -v "not owned" | sort -u) \
 authconfig \
 cloud-init \
 kernel \
