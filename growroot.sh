@@ -19,18 +19,14 @@ _fatal() {
 
 _growroot() {
 	# Compute root-device
-	if [[ -z "${root##*mapper*}" ]]
+	if [ -z "${root##*mapper*}" ]
 	then
-		_info "${root} is hosted on an LVM2 volume"
-		IFS='-' read -ra VOLSTR <<< "${root##*mapper/}" 
-                if [[ ${#VOLSTR[@]} -eq 2 ]]
-		then
-			rootdev=$(readlink -f $(pvs --noheadings | \
-				awk '/VolGroup00/{print $1}'))
-                	echo "${rootdev}"
-		else
-			_fatal "${root} is hosted on a badly-named LVM2 volume."
-                fi
+##		_info "${root} is hosted on an LVM2 volume"
+		set -- "${root##*mapper/}"
+		VOLGRP=${1%-*}
+		ROOTVOL=${1#*-}
+		rootdev=$(readlink -f $(pvs --noheadings | awk '/VolGroup00/{print $1}'))
+		_info "Setting \$rootdev to ${rootdev} is hosted on an LVM2 volume"
         else
 		# Remove 'block:' prefix and find the root device
 		rootdev=$(readlink -f "${root#block:}")
