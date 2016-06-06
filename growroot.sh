@@ -21,13 +21,12 @@ _growroot() {
 	# Compute root-device
 	if [ -z "${root##*mapper*}" ]
 	then
-##		_info "${root} is hosted on an LVM2 volume"
 		set -- "${root##*mapper/}"
 		VOLGRP=${1%-*}
 		ROOTVOL=${1#*-}
 		rootdev=$(readlink -f $(pvs --noheadings | awk '/'${VOLGRP}'/{print $1}'))
-		_info "Setting \$rootdev to ${rootdev} is hosted on an LVM2 volume"
-        else
+		_info "'/' is hosted on an LVM2 volume: setting \$rootdev to ${rootdev}"
+	else
 		# Remove 'block:' prefix and find the root device
 		rootdev=$(readlink -f "${root#block:}")
 	fi
