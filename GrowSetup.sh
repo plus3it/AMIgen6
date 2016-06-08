@@ -17,6 +17,7 @@ then
 fi
 
 # Use a patched version of the EPEL-hosted grow-script
+# - this should be unnecessary if/when BZ #1343571 is resolved
 if [[ -d ${CHROOT}/${GROWDIR} ]]
 then
    cp ${SCRIPTROOT}/growroot.sh ${CHROOT}/${GROWDIR}
@@ -24,6 +25,14 @@ then
    then
       printf "Failed to copy patched growroot.sh to " > /dev/stderr
       echo "${CHROOT}/${GROWDIR}." > /dev/stderr
+      exit 1
+   fi
+
+   # Ensure LVM-related binaries are in initramfs
+   rpm -qlf /sbin/pvs | grep "/sbin/" | sed 's/^\/sbin\//dracut_install /' >> ${CHROOT}/${GROWDIR}/install
+   if [[ $? -ne 0 ]]
+   then
+      echo "Failed to patch dracut 'install' file. Aborting..." > /dev/stderr
       exit 1
    fi
 fi
