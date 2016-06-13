@@ -6,9 +6,10 @@
 SCRIPTROOT="$(dirname ${0})"
 CHROOT="${CHROOT:-/mnt/ec2-root}"
 GROWDIR="usr/share/dracut/modules.d/50growroot"
+EPELREPO="${1:-epel}"
 
 # Install the grow modules from EPEL
-yum --installroot=$CHROOT --enablerepo=epel install -y dracut-modules-growroot
+yum --installroot=$CHROOT --enablerepo="${EPELREPO}" install -y dracut-modules-growroot
 
 if [[ $? -ne 0 ]]
 then
