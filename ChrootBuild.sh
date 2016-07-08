@@ -6,6 +6,8 @@
 PROGNAME=$(basename "$0")
 CHROOT="${CHROOT:-/mnt/ec2-root}"
 CONFROOT=$(dirname $0)
+REPORFILEPMS="$(rpm --qf '%{name}\n' -qf /etc/yum.repos.d/* 2>&1 | \
+               grep -v "not owned" | sort -u)"
 
 function PrepChroot() {
    local DISABLEREPOS="*media*,*epel*,C*-*"
@@ -16,12 +18,11 @@ function PrepChroot() {
    fi
 
    yumdownloader --destdir=/tmp $(rpm --qf '%{name}\n' -qf /etc/redhat-release)
-   yumdownloader --destdir=/tmp $(rpm --qf '%{name}\n' \
-      -qf /etc/yum.repos.d/* 2>&1 | grep -v "not owned" | sort -u)
+   yumdownloader --destdir=/tmp "${REPORFILEPMS}"
    rpm --root ${CHROOT} --initdb
    rpm --root ${CHROOT} -ivh --nodeps /tmp/*.rpm
    yum --enablerepo=* --disablerepo=${DISABLEREPOS} --installroot=${CHROOT} \
-      -y reinstall $(rpm --qf '%{name}\n' -qf /etc/yum.repos.d/* 2>&1 | grep -v "not owned" | sort -u)
+      -y reinstall "${REPORFILEPMS}"
 
    # if alt-repo defined, disable everything, then install alt-repo
    if [[ ! -z ${REPORPM+xxx} ]]
@@ -93,12 +94,15 @@ PrepChroot
 
 if [[ ! -z ${BONUSREPO+xxx} ]]
 then
-   ENABREPO=--enablerepo="${BONUSREPO}"
+   ENABREPO="--enablerepo=${BONUSREPO}"
+   YUMCMD="yum --nogpgcheck --installroot=${CHROOT} ${ENABREPO} install -y" 
+else
+   YUMCMD="yum --nogpgcheck --installroot=${CHROOT} install -y" 
 fi
 
 # Install main RPM-groups
-yum --nogpgcheck --installroot=${CHROOT} "${ENABREPO}" install -y @Core -- \
-$(rpm --qf '%{name}\n' -qf /etc/yum.repos.d/* 2>&1 | grep -v "not owned" | sort -u) \
+${YUMCMD} @Core -- \
+"${REPORFILEPMS}" \
 authconfig \
 cloud-init \
 kernel \
