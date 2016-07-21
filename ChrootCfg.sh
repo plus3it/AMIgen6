@@ -4,6 +4,7 @@
 #
 #####################################
 CHROOT="${CHROOT:-/mnt/ec2-root}"
+EXECIT=${LOCALSCRIPT:-UNDEF}
 TARGDEV="${1:-UNDEF}"
 NTPCONF="${CHROOT}/etc/ntp.conf"
 CLOUDCF="${CHROOT}/etc/cloud/cloud.cfg"
@@ -69,3 +70,18 @@ umount ${CHROOT}/dev
    
 mount -o bind /dev/pts ${CHROOT}/dev/pts
 mount -o bind /dev/shm ${CHROOT}/dev/shm
+
+
+# Execute a localization-script if valid script-location
+# is passed via shell-env (LOCALSCRIPT)
+if [[ ${EXECIT} = "UNDEF" ]]
+then
+   echo "No content-localization requested..."
+elif [[ -s ${EXECIT} ]]
+then
+   echo "Attempting to execut ${EXECIT}"
+   bash "${EXECIT}"
+else
+   echo "Content-localization file is null: will not attempt execution."
+fi
+
