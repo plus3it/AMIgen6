@@ -42,7 +42,7 @@ fi
 mount ${LVMDEV} ${ALTROOT}/ || err_out 2 "Mount Failed"
 
 # Prep for next-level mounts
-mkdir -p ${ALTROOT}/{var,opt,home,boot,etc} || err_out 3 "Mountpoint Create Failed"
+mkdir -p ${ALTROOT}/{var,opt,home,boot,etc,selinux} || err_out 3 "Mountpoint Create Failed"
 
 # Mount the boot-root
 echo "Mounting ${BOOTDEV} to ${ALTROOT}/boot"
@@ -84,5 +84,6 @@ chown root:tty ${ALTROOT}/dev/ptmx
 # Do loopback mounts
 mount -o bind /proc ${ALTROOT}/proc/
 mount -o bind /sys ${ALTROOT}/sys/
+mount -o bind /selinux ${ALTROOT}/selinux
 mount -o bind /dev/pts ${ALTROOT}/dev/pts
 mount -o bind /dev/shm ${ALTROOT}/dev/shm
