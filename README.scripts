@@ -49,6 +49,9 @@ CleanChroot.sh:		Do some file cleanup...
 			<no arguments>
 HVMprep.sh:		Put GRUB into target EBS's MBR
 			ARGUMENT 1: dev-path to target disk
+GrowRoot.sh:		Ensure that the growroot dracut modules are installed
+			and that the requisite LVM2-supporting hacks are
+			pushed in. Recompiles kernel for the dracut module.
 PreRelabel.sh:          Do SELinux auto-relabel prior to taking the snapshot.
                         Obviates need for boot-time relabel operation.
 UmountChroot.sh:	Dismount and deactivate the chroot EBS
