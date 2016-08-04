@@ -16,6 +16,12 @@ chroot ${CHROOT} yum clean --enablerepo=* -y packages
 chroot ${CHROOT} rm -rf /var/cache/yum
 chroot ${CHROOT} rm -rf /var/lib/yum
 
+# Null out all of the files hosted in /var/log
+for FILE in $(find /var/log -type f)
+do
+  cat /dev/null > $FILE
+done
+
 # Nuke any history data
 cat /dev/null > ${CHROOT}/root/.bash_history
 
