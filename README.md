@@ -20,6 +20,9 @@ Additionally, some scripts have their own explanation files:
 
 If there are any gaps that not covered in these documentation-files, please open an [issue](../../issues).
 
+Additional Notes:
+* [Enabling 10Gbps Networking](docs/README.10Gbps_Support.md)
+
 Extensions planned for the future:
 * Enhancing the EBS-carving routines
   * Accommodate other than 20GiB root EBS
