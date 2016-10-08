@@ -18,6 +18,8 @@ Is the easiest way to ensure any available kernels are properly linked against t
 
 **>>>CRITICAL ITEM<<<**
 
+[DKMS may be used](README.DKMS_usage.md) to help ensure that each time a kernel RPM is installed, the relevant drivers are updated and installed for the newly-installed kernel.
+
 ## Procedure
 
 The following assumes the instance-owner has privileged access to the instance OS and can make AWS-level configuration changes to the instance-configuration:
