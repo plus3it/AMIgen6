@@ -1,0 +1,282 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "This template deploys an instance suitable for running AMI validation-tests against.",
+  "Parameters": {
+    "AmiId": {
+      "Description": "ID of the AMI to launch",
+      "Type": "String",
+      "AllowedPattern": "^ami-[0-9a-z]{8}$|^ami-[0-9a-z]{17}$"
+    },
+    "AmiDistro": {
+      "Description": "Linux distro of the AMI",
+      "Type": "String",
+      "Default": "CentOS",
+      "AllowedValues": [
+        "CentOS",
+        "RedHat"
+      ]
+    },
+    "KeyPairName": {
+      "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "InstanceType": {
+      "Description": "Amazon EC2 instance type",
+      "Type": "String",
+      "Default": "m4.large",
+      "AllowedValues": [
+        "m4.large",
+        "m4.xlarge",
+        "m4.2xlarge",
+        "c3.large",
+        "c3.xlarge",
+        "c3.2xlarge",
+        "c3.4xlarge",
+        "c3.8xlarge",
+        "c4.large",
+        "c4.xlarge",
+        "c4.2xlarge",
+        "c4.4xlarge",
+        "c4.8xlarge",
+        "d2.large",
+        "d2.2xlarge",
+        "d2.4xlarge",
+        "d2.8xlarge",
+        "i2.xlarge",
+        "i2.2xlarge",
+        "i2.4xlarge",
+        "i2.8xlarge",
+        "r3.large",
+        "r3.xlarge",
+        "r3.2xlarge",
+        "r3.4xlarge",
+        "r3.8xlarge"
+      ]
+    },
+    "NoPublicIp": {
+      "Description": "Controls whether to assign the instance a public IP. Recommended to leave at \"true\" _unless_ launching in a public subnet",
+      "Type": "String",
+      "Default": "true",
+      "AllowedValues": [
+        "false",
+        "true"
+      ]
+    },
+    "NoReboot": {
+      "Description": "Controls whether to reboot the instance as the last step of cfn-init execution",
+      "Type": "String",
+      "Default": "false",
+      "AllowedValues": [
+        "false",
+        "true"
+      ]
+    },
+    "SecurityGroupIds": {
+      "Description": "List of security groups to apply to the instance(s)",
+      "Type": "List<AWS::EC2::SecurityGroup::Id>"
+    },
+    "SubnetIds": {
+      "Type": "String",
+      "Description": "Subnet to associate to the Instance"
+    },
+    "RootEBSsize": {
+      "Description": "Select size of root EBS volume",
+      "Default": "25",
+      "Type": "Number"
+    }
+  },
+  "Conditions": {
+    "Reboot": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "NoReboot"
+            },
+            "true"
+          ]
+        }
+      ]
+    },
+    "AssignPublicIp": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "NoPublicIp"
+            },
+            "true"
+          ]
+        }
+      ]
+    }
+  },
+  "Mappings": {
+    "Distro2RootDevice": {
+      "RedHat": {
+        "DeviceName": "sda1"
+      },
+      "CentOS": {
+        "DeviceName": "sda1"
+      }
+    }
+  },
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "EC2 Instance Configuration"
+          },
+          "Parameters": [
+            "AmiId",
+            "AmiDistro",
+            "InstanceType",
+            "InstanceRole",
+            "KeyPairName",
+            "NoPublicIp",
+            "NoReboot",
+            "SecurityGroupIds"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Network Configuration"
+          },
+          "Parameters": [
+            "SubnetIds"
+          ]
+        }
+      ]
+    }
+  },
+  "Resources": {
+    "ValidationInstance": {
+      "Type": "AWS::EC2::Instance",
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Count": "1",
+          "Timeout": "PT30M"
+        }
+      },
+      "Properties": {
+        "ImageId": {
+          "Ref": "AmiId"
+        },
+        "InstanceType": {
+          "Ref": "InstanceType"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": {
+              "Fn::Join": [
+                "",
+                [
+                  "/dev/",
+                  {
+                    "Fn::FindInMap": [
+                      "Distro2RootDevice",
+                      {
+                        "Ref": "AmiDistro"
+                      },
+                      "DeviceName"
+                    ]
+                  }
+                ]
+              ]
+            },
+            "Ebs": {
+              "VolumeType": "gp2",
+              "VolumeSize" : {
+                "Ref": "RootEBSsize"
+              },
+              "DeleteOnTermination": "true"
+            }
+          }
+        ],
+        "KeyName": {
+          "Ref": "KeyPairName"
+        },
+        "NetworkInterfaces": [
+          {
+            "DeviceIndex": "0",
+            "AssociatePublicIpAddress": {
+              "Fn::If": [
+                "AssignPublicIp",
+                "true",
+                "false"
+              ]
+            },
+            "GroupSet": {
+              "Ref": "SecurityGroupIds"
+            },
+            "SubnetId": {
+              "Ref": "SubnetIds"
+            }
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#cloud-config\n",
+                "\n",
+                "users:\n",
+                "  - default\n",
+                "  - name: testusr0\n",
+                "    ssh-authorized-keys:\n",
+                "    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDbwH7xQhVtZTU2JC8k7WqV1JXxCDlHpVOShgFVJkSMkWb1WFX4601LWCPBTlpZnyJBmfEurFA/GVckiXWJM4RvtBDBILxONrqic8bSIn4mo0L+rKYmwxuw6u31e0y23JSGQOCOZOoUOgA1BKw+99FNHbFkLI2+9qJlk+JsEcf5NQ== testusr0\n",
+                "    groups: wheel\n",
+                "    lock-passwd: True\n",
+                "    selinux-user: unconfined_u\n",
+                "  - name: testusr0\n",
+                "    ssh-authorized-keys:\n",
+                "    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQC/7f14gKpcqYVW0FNe7nlJ+kFV2gtZpznjGEN9+2CiWaQrKBcUUhTuxBJw5Clwa1jG5rvOycyE7QNM2nPHExhWfKsqUWK3V1M+WqMZ0oA/mOuUkyLv7S7Ivzq2G0P9LSYBa4GSNZis+ksJY5ZIAGSbQrN4tMu1ak9v658I7M2u0Q== testusr1\n",
+                "    groups: wheel\n",
+                "    lock-passwd: True\n",
+                "    selinux-user: unconfined_u\n",
+                "package_upgrade: True\n",
+                "write_files:\n",
+                "  - path: /var/tmp/fixup.sh\n",
+                "    content: |-\n",
+                "        #!/bin/sh\n",
+                "        for DEV in $(lsblk -ln | awk '/ part /{ print $1}')\n",
+                "        do\n",
+                "           pvresize /dev/${DEV}\n",
+                "        done\n",
+                "        sed -i '/fixup\\.sh/d' /etc/rc.d/rc.local\n",
+                "        rm $0\n",
+                "    owner: root:root\n",
+                "    permissions: '0755'\n",
+                "runcmd:\n",
+                "  - echo /var/tmp/fixup.sh >> /etc/rc.d/rc.local\n",
+                "  - init 6\n"
+              ]
+            ]
+          }
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "27302f4a-3821-456c-8b7d-7a0798880b7a"
+        }
+      }
+    }
+  }
+}
