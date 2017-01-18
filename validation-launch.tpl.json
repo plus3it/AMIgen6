@@ -25,6 +25,7 @@
       "Type": "String",
       "Default": "m4.large",
       "AllowedValues": [
+        "t2.micro",
         "m4.large",
         "m4.xlarge",
         "m4.2xlarge",
@@ -153,12 +154,6 @@
   "Resources": {
     "ValidationInstance": {
       "Type": "AWS::EC2::Instance",
-      "CreationPolicy": {
-        "ResourceSignal": {
-          "Count": "1",
-          "Timeout": "PT30M"
-        }
-      },
       "Properties": {
         "ImageId": {
           "Ref": "AmiId"
@@ -273,8 +268,7 @@
         }
       },
       "Metadata": {
-        "AWS::CloudFormation::Designer": {
-          "id": "27302f4a-3821-456c-8b7d-7a0798880b7a"
+        "AWS::CloudFormation::Init": {
         }
       }
     }
