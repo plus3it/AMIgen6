@@ -17,6 +17,11 @@
         "RedHat"
       ]
     },
+    "InstanceRole" : {
+      "Description" : "IAM instance role to apply to the instance(s)",
+      "Type" : "String",
+      "Default" : ""
+    },
     "KeyPairName": {
       "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
       "Type": "AWS::EC2::KeyPair::KeyName"
@@ -92,6 +97,19 @@
     }
   },
   "Conditions": {
+    "AssignInstanceRole" :
+    {
+      "Fn::Not" : [
+        {
+          "Fn::Equals" : [
+            {
+              "Ref" : "InstanceRole"
+            },
+            ""
+          ]
+        }
+      ]
+    },
     "Reboot": {
       "Fn::Not": [
         {
@@ -165,6 +183,13 @@
         },
         "InstanceType": {
           "Ref": "InstanceType"
+        },
+        "IamInstanceProfile" : {
+          "Fn::If" : [
+            "AssignInstanceRole",
+            { "Ref" : "InstanceRole" },
+            { "Ref" : "AWS::NoValue" }
+          ]
         },
         "Tags": [
           {
@@ -256,13 +281,17 @@
                 "  - path: /var/tmp/fixup.sh\n",
                 "    content: |-\n",
                 "        #!/bin/sh\n",
+                "        AMIID=$(curl http://169.254.169.254/latest/meta-data/ami-id/)\n",
+                "        \n",
                 "        for DEV in $(lsblk -ln | awk '/ part /{ print $1}')\n",
                 "        do\n",
                 "           pvresize /dev/${DEV}\n",
                 "        done\n",
+                "        \n",
                 "        sed -i '/fixup\\.sh/d' /etc/rc.d/rc.local\n",
+                "        \n",
                 "        rm $0\n",
-                "        install -b -m 0644 -o maintuser /home/maintuser/audit.out\n",
+                "        \n",
                 "        (\n",
                 "         printf \"Check 10Gbps support: \"\n",
                 "         if [[ $(ethtool eth0 | awk '/Speed:/{ print $2}') = \"10000Mb/s\" ]]\n",
@@ -302,7 +331,8 @@
                 "            echo \"not enabled\"\n",
                 "            RETVAL=1\n",
                 "         fi\n",
-                "        ) > /home/maintuser/audit.out\n",
+                "        ) > /tmp/audit_${AMIID}.txt\n",
+                "        aws s3 cp /tmp/audit_${AMIID}.txt s3://spel-stuffs/artifacts/validation/\n",
                 "    owner: root:root\n",
                 "    permissions: '0755'\n",
                 "runcmd:\n",
