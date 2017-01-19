@@ -22,6 +22,11 @@
       "Type" : "String",
       "Default" : ""
     },
+    "BucketName" : {
+      "Description" : "IAM instance role to apply to the instance(s)",
+      "Type" : "String",
+      "Default" : ""
+    },
     "KeyPairName": {
       "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
       "Type": "AWS::EC2::KeyPair::KeyName"
@@ -332,7 +337,9 @@
                 "            RETVAL=1\n",
                 "         fi\n",
                 "        ) > /tmp/audit_${AMIID}.txt\n",
-                "        aws s3 cp /tmp/audit_${AMIID}.txt s3://spel-stuffs/artifacts/validation/\n",
+                "        aws s3 cp /tmp/audit_${AMIID}.txt s3://",
+                         { "Ref" : "BucketName" }, 
+                                                               "/artifacts/validation/\n",
                 "    owner: root:root\n",
                 "    permissions: '0755'\n",
                 "runcmd:\n",
