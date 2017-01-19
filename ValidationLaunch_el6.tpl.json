@@ -4,6 +4,7 @@
   "Parameters": {
     "AmiId": {
       "Description": "ID of the AMI to launch",
+      "ConstraintDescription": "All ID's must start 'ami-' followed by an 8- to 17-character alphanumeric string.",
       "Type": "String",
       "AllowedPattern": "^ami-[0-9a-z]{8}$|^ami-[0-9a-z]{17}$"
     },
@@ -22,6 +23,7 @@
     },
     "InstanceType": {
       "Description": "Amazon EC2 instance type",
+      "ConstraintDescription": "must be a valid EC2 instance type.",
       "Type": "String",
       "Default": "m4.large",
       "AllowedValues": [
@@ -57,7 +59,7 @@
     "NoPublicIp": {
       "Description": "Controls whether to assign the instance a public IP. Recommended to leave at \"true\" _unless_ launching in a public subnet",
       "Type": "String",
-      "Default": "true",
+      "Default": "false",
       "AllowedValues": [
         "false",
         "true"
@@ -66,7 +68,7 @@
     "NoReboot": {
       "Description": "Controls whether to reboot the instance as the last step of cfn-init execution",
       "Type": "String",
-      "Default": "false",
+      "Default": "true",
       "AllowedValues": [
         "false",
         "true"
@@ -82,8 +84,11 @@
     },
     "RootEBSsize": {
       "Description": "Select size of root EBS volume",
+      "ConstraintDescription": "A numeric value > '20' and < '50'.",
+      "Type": "Number",
       "Default": "25",
-      "Type": "Number"
+      "MinValue": "21",
+      "MaxValue": "49"
     }
   },
   "Conditions": {
