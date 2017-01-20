@@ -68,7 +68,43 @@ If all goes well, the `aws cloudformtation` command will result in an output mes
 
     Then click on the "Create" button.
 
-1. Blah
+1. Place the URL to the template in the `Specify an Amazon S3 template URL` box.
+
+    <img src="https://cloud.githubusercontent.com/assets/7087031/22160754/0d6a9b1a-df15-11e6-90fd-594cdaa7a91e.png" alt="amivalidate-step2" width="75%" height="75%">
+
+    Then click on the "Next" button.
+
+1. On the `Specify Details` page:
+
+    <img src="https://cloud.githubusercontent.com/assets/7087031/22161151/295de7da-df17-11e6-9a7a-b55a85777473.png" alt="amivalidate-step3" width="75%" height="75%">
+
+    Ensure that each box contains valid values. Then click on the "Next" button.
+
+1. On the `Options` page:
+
+    <img src="https://cloud.githubusercontent.com/assets/7087031/22160758/0d722e52-df15-11e6-849e-d2633e70b5ff.png" alt="amivalidate-step4" width="75%" height="75%">
+
+   (Optional) Check the `No` radio-box in the `Rollback on failure` section. Doing this should allow you to investigate what went wrong in the instance should the stack-creation fail.
+
+    Then click on the "Next" button.
+
+1. Verify that the data on the `Review` page looks correct:
+
+    <img src="https://cloud.githubusercontent.com/assets/7087031/22160756/0d6c3b0a-df15-11e6-8766-204d2e215a42.png" alt="amivalidate-step5" width="75%" height="75%">
+
+    Then click on the "Next" button. This will cause CloudFormation to attempt assemble your AMI-validation stack.
+
+1. Once CloudFormation kicks off the stack-assembly process, the Web UI will return to the `Stacks` page:
+
+    <img src="https://cloud.githubusercontent.com/assets/7087031/22160757/0d6dd6b8-df15-11e6-8777-c1120c846c02.png" alt="amivalidate-step6" width="75%" height="75%">
+
+    The new stack should show up in either a `CREATE_IN_PROCESS` or `CREATE_COMPLETE` stage.
+
+    Note: If the page renders and your stack does not appear, hit the page-refresh button. 
+
+1. Click on the stack-name if you want to see the details of the stack-creation process:
+
+    <img src="https://cloud.githubusercontent.com/assets/7087031/22160755/0d6c1e5e-df15-11e6-8778-d05fec1ec3ba.png" alt="amivalidate-step7" width="75%" height="75%">
 
 ## Results
 Allow 3-5 minutes to pass after receiving the StackId (if using the CLI method) or the Web UI shows the stack in `CREATE_COMPLETE` state. Look in `s3://<BUCKET_NAME>/artifacts/validation/` for a new audit file. The audit-file will take a name similar to: `audit_<AMI_ID>-<YYYYMmmDD>.txt` (where `AMI_ID` is the ID of the AMI that was validated and `YYYMmmDD` will be something like `2017Jan11`). The file's contents will be similar to:

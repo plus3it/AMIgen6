@@ -23,7 +23,7 @@
       "Default" : ""
     },
     "BucketName" : {
-      "Description" : "IAM instance role to apply to the instance(s)",
+      "Description" : "Name of the S3 bucket hosting the audit-artifacts.",
       "Type" : "String",
       "Default" : ""
     },
@@ -93,7 +93,7 @@
       "Description": "Subnet to associate to the Instance"
     },
     "RootEBSsize": {
-      "Description": "Select size of root EBS volume",
+      "Description": "Select size of root EBS volume (in GiB)",
       "ConstraintDescription": "A numeric value > '20' and < '50'.",
       "Type": "Number",
       "Default": "25",
@@ -163,9 +163,8 @@
             "InstanceType",
             "InstanceRole",
             "KeyPairName",
-            "NoPublicIp",
             "NoReboot",
-            "SecurityGroupIds"
+            "RootEBSsize"
           ]
         },
         {
@@ -173,7 +172,9 @@
             "default": "Network Configuration"
           },
           "Parameters": [
-            "SubnetIds"
+            "SubnetIds",
+            "SecurityGroupIds",
+            "NoPublicIp"
           ]
         }
       ]
