@@ -17,7 +17,7 @@ Additionally, some scripts have their own explanation files:
 - [Packages-Core.md](Packages-Core.md): Details packages installed to chroot via "@Core" build-profile.
 - [Packages-CloudInit.md](Packages-CloudInit.md): Details further packages installed to chroot due to cloud-init and its dependencies.
 - [Packages-MinExtra.md](Packages-MinExtra.md): List of extra packages and dependencies required in the chroot to provide LVM2 functionality and to support HVM instance-types.
-- [AMI Validation](docs/README.validation.md): tips on how to verify that resultant AMIs produce instances with expected functionality.
+- [AMI Validation](docs/README_validation.md): tips on how to verify that resultant AMIs produce instances with expected functionality.
 
 If there are any gaps that not covered in these documentation-files, please open an [issue](../../issues).
 
