@@ -61,6 +61,14 @@ If all goes well, the `aws cloudformtation` command will result in an output mes
 
 ### Web UI-based:
 
+1. (optional) Upload the [validation template](ValidationLaunch_el6.tpl.json) to an S3 bucket.
+1. Open the CloudFormation service-page:
+
+    <img src="https://cloud.githubusercontent.com/assets/7087031/22160753/0d691844-df15-11e6-92be-37222f280101.png" alt="amivalidate-step1" width="75%" height="75%">
+
+    Then click on the "Create" button.
+
+1. Blah
 
 ## Results
 Allow 3-5 minutes to pass after receiving the StackId (if using the CLI method) or the Web UI shows the stack in `CREATE_COMPLETE` state. Look in `s3://<BUCKET_NAME>/artifacts/validation/` for a new audit file. The audit-file will take a name similar to: `audit_<AMI_ID>-<YYYYMmmDD>.txt` (where `AMI_ID` is the ID of the AMI that was validated and `YYYMmmDD` will be something like `2017Jan11`). The file's contents will be similar to:

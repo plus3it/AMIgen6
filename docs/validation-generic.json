@@ -9,11 +9,11 @@
   },
   {
     "ParameterKey": "BucketName",
-    "ParameterValue": "__BUKKITNAME__"		# default = "spel-stuffs"
+    "ParameterValue": "__BUKKITNAME__"
   },
   {
     "ParameterKey": "InstanceRole",
-    "ParameterValue": "__INSTANCEROLE__"	# default "INSTANCE_S3_ADMIN"
+    "ParameterValue": "__INSTANCEROLE__"
   },
   {
     "ParameterKey": "InstanceType",
