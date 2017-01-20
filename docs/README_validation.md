@@ -1,5 +1,7 @@
 # Verification 
 
+*Note:* This document describes steps for manually validating AMIs produced with AMIgen. Automated procuedures - supplemented with CloudFormation templates and other AWS components - are described in the [Automated Validation](README_validation-automated.md) document.
+
 After creating an AMI, it is recommended to launch an instance from the AMI and perform some configuration-verification tasks before publishing the AMI. The AMIgen-created AMIs are notable for supporting:
 - Use of LVM for managing root (OS) filesystems (to meet STIG and related security guidelines' requirements).
 - Enablement of SELinux (in "Permissive" mode) with initial labels applied prior to launch (speeds first boot).

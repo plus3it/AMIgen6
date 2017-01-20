@@ -1,0 +1,124 @@
+# Verification
+
+The validation of the generated AMIs can be automated via AWS's CloudFormation functionality. This project includes a [suitable template](ValidationLaunch_el6.tpl.json) to automate the validation procedures and to generate and post a validation-report to an S3-hosted folder.
+
+## Procedure:
+
+### CLI-based:
+
+1. (optional) Upload the [validation template](ValidationLaunch_el6.tpl.json) to an S3 bucket.
+1. Create parameters file. This file contains a list of key-value pairs that the CloudFormation CLI uses to fill in a template's input fields. The parameters file content looks like:
+
+    ```json
+[
+  {
+    "ParameterKey": "KeyName1",
+    "ParameterValue": "KeyVal1"
+  },
+    ```
+[...elided...]
+    ```json
+  {
+    "ParameterKey": "KeyNameN",
+    "ParameterValue": "KeyValN"
+  }
+]
+    ```
+
+    Look at the [example file](validation-generic.json) if the above is not clear.
+
+1. Update the parameters file contents with values appropriate to your testing-environment.
+
+    - `AmiDistro`: This will be a value of either `CentOS` or `RedHat`.
+    - `AmiId`: This will be the image-ID of the AMI you wish to validate.
+    - `BucketName`: This is the name of the S3 bucket that audit-artifacts are uploaded. By default, the audit-reports will be written to the `s3://<BUKKITNAME>/artifacts/validation/` bucket-folder.
+    - `InstanceRole`: An instance-role to assign to the testing instance. Note that, in order to write the report-file to S3, the instance-role will need to have write permissions to `s3://<BUKKITNAME>/artifacts/validation/`.
+    - `InstanceType`: The instance-type that the test-instance will be launched as. Recommend `m4.large` (other instance-types may be selected but may cause the 10Gbps-support test to report lack of 10Gbps support).
+    - `KeyPairName`: This is the logical-name of the provisioning key. This key will allow the tester to SSH into the default-user's account. A valid keyname must be given, even if there's no intention to login to the test-instance.
+    - `NoPublicIp`: Whether to assign a public IP to the instance. Set to "false" if intending to SSH into the host from a host outside of AWS.
+    - `NoReboot`: Whether to reboot the instance or not. Set to "true" to prevent rebooting.
+    - `RootEBSsize`: Size of the root EBS volume to launch the instance with. Valid values are from 21-49 (recommend "25").
+    - `SecurityGroupIds`: This is either a single value or comma-delimited list of values of valid security-group IDs for the testing-account.
+    - `SubnetIds`: This is the subnet to launch the test-instance into.
+
+1. Ensure that AWS credentials for your account/role are set.
+1. Ensure that the `aws` command is in your path (execute `aws --version`).
+1. Create the test instance from the template and parameter file:
+
+    ```bash
+aws --profile <PROFILE> cloudformation --region <REGION> \
+   --template-url <TEMPLATE_URL> \
+   --parameters "file://<PATH>/<to>/<PARAM>/File
+    ```
+
+If all goes well, the `aws cloudformtation` command will result in an output message similar to:
+
+```json
+{
+    "StackId": "arn:aws:cloudformation:us-east-2:NNNNNNNNNNNN:stack/TEST-STDIN/1db002e4-d0dd-1e61-ba4b-05052c82a405"
+}
+```
+
+### Web UI-based:
+
+
+## Results
+Allow 3-5 minutes to pass after receiving the StackId (if using the CLI method) or the Web UI shows the stack in `CREATE_COMPLETE` state. Look in `s3://<BUCKET_NAME>/artifacts/validation/` for a new audit file. The audit-file will take a name similar to: `audit_<AMI_ID>-<YYYYMmmDD>.txt` (where `AMI_ID` is the ID of the AMI that was validated and `YYYMmmDD` will be something like `2017Jan11`). The file's contents will be similar to:
+
+```
+Check 10Gbps support: Found 10Gbps support
+==========
+Check EBS-resizing: Root EBS was resized
+==========
+Check for AWS packages:
+   aws-apitools-elb-1.0.35.0-1.0.el6.noarch
+   aws-apitools-as-1.0.61.6-1.0.el6.noarch
+   aws-amitools-ec2-1.5.7-1.0.el6.noarch
+   aws-apitools-common-1.1.0-1.9.el6.noarch
+   aws-cfn-bootstrap-1.4-12.7.el6.noarch
+   aws-apitools-mon-1.0.20.0-1.0.el6.noarch
+   aws-apitools-ec2-1.7.3.0-1.0.el6.noarch
+==========
+Check AWS CLI version:
+   aws-cli/1.11.37 Python/2.6.6 Linux/2.6.32-642.13.1.el6.x86_64 botocore/1.5.0
+==========
+Check RPM repo-access:
+repo id                repo name                                  status
+[...elided...]
+base                   CentOS-6 - Base                            enabled: 6,696
+[...elided...]
+epel                   Extra Packages for Enterprise Linux 6 - x8 disabled
+[...elided...]
+extras                 CentOS-6 - Extras                          enabled:    62
+fasttrack              CentOS-6 - fasttrack                       disabled
+updates                CentOS-6 - Updates                         enabled:   780
+repolist: 7,538
+==========
+Active swap device(s): 
+   /dev/dm-1
+==========
+Mounted partition for /boot was found
+==========
+/tmp is mounted from tmpfs
+==========
+Check booted kernel: 
+   Name        : kernel                       Relocations: (not relocatable)
+   Version     : 2.6.32                            Vendor: CentOS
+   Release     : 642.13.1.el6                  Build Date: Wed 11 Jan 2017 09:23:49 PM UTC
+   Install Date: Tue 17 Jan 2017 05:47:30 PM UTC      Build Host: c1bm.rdu2.centos.org
+   Group       : System Environment/Kernel     Source RPM: kernel-2.6.32-642.13.1.el6.src.rpm
+   Size        : 137370307                        License: GPLv2
+   Signature   : RSA/SHA1, Thu 12 Jan 2017 03:47:10 PM UTC, Key ID 0946fca2c105b9de
+   Packager    : CentOS BuildSystem <http://bugs.centos.org>
+   URL         : http://www.kernel.org/
+   Summary     : The Linux kernel
+   Description :
+   The kernel package contains the Linux kernel (vmlinuz), the core of any
+   Linux operating system.  The kernel handles the basic functions
+   of the operating system: memory allocation, process allocation, device
+   input and output, etc.
+==========
+Check SELinux mode: Permissive
+==========
+Check Xen root-dev mapping: enabled
+```
