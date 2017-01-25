@@ -18,7 +18,7 @@ Is the easiest way to ensure any available kernels are properly linked against t
 
 **>>>CRITICAL ITEM<<<**
 
-[DKMS may be used](README.DKMS_usage.md) to help ensure that each time a kernel RPM is installed, the relevant drivers are updated and installed for the newly-installed kernel.
+[DKMS may be used](README_DKMS_usage.md) to help ensure that each time a kernel RPM is installed, the relevant drivers are updated and installed for the newly-installed kernel.
 
 ## Procedure
 
@@ -26,7 +26,7 @@ The following assumes the instance-owner has privileged access to the instance O
 
 1. Login to the instance
 2. Escalate privileges to root
-3. Install the up-to-date `ixgbevf` driver. This can be installed either by compiling from source or pre-compiled binaries (see [Creating ixgbevf RPM](README.create_driver_RPM.md) for steps on how to create a binary RPM from the SourceForge-hosted sourcecode)
+3. Install the up-to-date `ixgbevf` driver. This can be installed either by compiling from source or pre-compiled binaries (see [Creating ixgbevf RPM](README_create_driver_RPM.md) for steps on how to create a binary RPM from the SourceForge-hosted sourcecode)
 4. Delete any `*persistent-net*.rules` files found in the `/etc/udev/rules.d` directory (one or both of `70-persistent-net.rules` and `75-persistent-net-generator.rules` may be present)
 5. Ensure that an `/etc/modprobe.d` file with the following minimum contents exists:
     

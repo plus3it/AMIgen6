@@ -7,9 +7,9 @@ If attempting to port for other EL6 derivatives that use publicly-accessible rep
 Please read through all of the READMEs before using. Most of the errors you're likely to encounter can be avoided by doing so:
 
 - [README.md](README.md): This file
-- [README.dependencies.md](README.dependencies.md): Contains a list of packages that need to be present on the build-host for these scripts to run correctly. Bottom of file includes a user-data excerpt that will cause these dependencies to be satisfied.
-- [README.profile](README.profile): List of environment variables that should be set.
-- [README.scripts](README.scripts): Contains an list of the scripts in this archive and explanations of their functionalities and any arguments/options that may be passed to the scripts. These scripts should be executed in the order listed.
+- [README_dependencies.md](README_dependencies.md): Contains a list of packages that need to be present on the build-host for these scripts to run correctly. Bottom of file includes a user-data excerpt that will cause these dependencies to be satisfied.
+- [README_profile](README_profile): List of environment variables that should be set.
+- [README_scripts](README_scripts): Contains an list of the scripts in this archive and explanations of their functionalities and any arguments/options that may be passed to the scripts. These scripts should be executed in the order listed.
 
 Additionally, some scripts have their own explanation files:
 - [AWScliSetup.sh.md](AWScliSetup.sh.md): Details for use of the AWScliSetup.sh script's options.
