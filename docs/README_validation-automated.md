@@ -32,7 +32,7 @@ The validation of the generated AMIs can be automated via AWS's CloudFormation f
     - `AmiDistro`: This will be a value of either `CentOS` or `RedHat`.
     - `AmiId`: This will be the image-ID of the AMI you wish to validate.
     - `BucketName`: This is the name of the S3 bucket that audit-artifacts are uploaded. By default, the audit-reports will be written to the `s3://<BUKKITNAME>/artifacts/validation/` bucket-folder.
-    - `InstanceRole`: An instance-role to assign to the testing instance. Note that, in order to write the report-file to S3, the instance-role will need to have write permissions to `s3://<BUKKITNAME>/artifacts/validation/`.
+    - `InstanceRole`: An instance-role to assign to the testing instance. Note that, in order to write the eport-file to S3, the instance-role will need to have [write permissions](README_validation-IAM_Rules.md) to `s3://<BUKKITNAME>/artifacts/validation/`.
     - `InstanceType`: The instance-type that the test-instance will be launched as. Recommend `m4.large` (other instance-types may be selected but may cause the 10Gbps-support test to report lack of 10Gbps support).
     - `KeyPairName`: This is the logical-name of the provisioning key. This key will allow the tester to SSH into the default-user's account. A valid keyname must be given, even if there's no intention to login to the test-instance.
     - `NoPublicIp`: Whether to assign a public IP to the instance. Set to "false" if intending to SSH into the host from a host outside of AWS.
