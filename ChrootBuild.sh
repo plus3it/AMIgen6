@@ -146,7 +146,7 @@ yum-utils \
 if [[ ! -z ${EXTRARPMS+xxx} ]]
 then
    printf "##########\n## Installing requested RPMs/groups\n##########\n"
-   yum install -y "${EXTRARPMS[@]}"
+   ${YUMCMD} "${EXTRARPMS[@]}"
 else
    echo "No 'extra' RPMs requested"
 fi
