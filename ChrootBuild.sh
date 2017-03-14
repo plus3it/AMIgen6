@@ -141,3 +141,12 @@ yum-utils \
 -libvirt-java-devel \
 -nc \
 -sendmail 
+
+# Install additionally-requested RPMs
+if [[ ! -z ${EXTRARPMS+xxx} ]]
+then
+   printf "##########\n## Installing requested RPMs/groups\n##########\n"
+   ${YUMDO} "${EXTRARPMS[@]}"
+else
+   echo "No 'extra' RPMs requested"
+fi
