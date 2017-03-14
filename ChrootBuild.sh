@@ -46,7 +46,7 @@ function PrepChroot() {
 ######################
 
 # See if we'e passed any valid flags
-OPTIONBUFR=$(getopt -o r:b: --long repouri:bonusrepos: -n ${PROGNAME} -- "$@")
+OPTIONBUFR=$(getopt -o r:b:e: --long repouri:bonusrepos:extras: -n ${PROGNAME} -- "$@")
 eval set -- "${OPTIONBUFR}"
 
 while [[ true ]]
@@ -78,6 +78,19 @@ do
 	       ;;
 	 esac
 	 ;;
+      -e|--extras)
+         case "$2" in
+            "")
+               echo "Error: option required but not specified" > /dev/stderr
+               shift 2;
+               exit 1
+               ;;
+            *)
+               EXTRARPMS=($(echo ${2} | sed 's/,/ /g'))
+               shift 2;
+               ;;
+         esac
+         ;;
       --)
          shift
 	 break
