@@ -2,6 +2,11 @@
 #
 # Add contents necessary to make AMI grow to up-sized root-EBS
 #
+# Solution inspired by article found at BackSlasher.Net:
+#    http://blog.backslasher.net/growroot-centos.html
+#
+# This script modifies the dracut contents to be LVM-compatible.
+#
 #################################################################
 SCRIPTROOT="$(dirname ${0})"
 CHROOT="${CHROOT:-/mnt/ec2-root}"
