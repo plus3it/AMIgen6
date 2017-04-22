@@ -17,6 +17,12 @@
         "RedHat"
       ]
     },
+    "CfnEndpointUrl": {
+      "Description": "URL to the CloudFormation Endpoint. e.g. https://cloudformation.us-east-1.amazonaws.com",
+      "Type": "String",
+      "Default": "",
+      "AllowedPattern": "^$|^http://.*$|^https://.*$"
+    },
     "InstanceRole" : {
       "Description" : "IAM instance role to apply to the instance(s)",
       "Type" : "String",
@@ -172,6 +178,7 @@
             "default": "Network Configuration"
           },
           "Parameters": [
+            "CfnEndpointUrl",
             "SubnetIds",
             "SecurityGroupIds",
             "NoPublicIp"
