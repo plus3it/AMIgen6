@@ -94,7 +94,7 @@ After the test instance completes its boot-sequence, login to the intance.
 
     <img alt="SEL-mode Check" src="https://cloud.githubusercontent.com/assets/7087031/21895699/a2e1908c-d8b1-11e6-9c1e-c0b579bbff28.png" width="70%" heigt="70%">
 
-1. Verify that the AMI was properly cleaned up: the `/var/lib/instances/` directory should have only *one* subdirectory (its name should match the id of the launched instance) and the only history in the yum database should be those actions that occured during instance launch (yum history dates should be within minutes of the current system date).
+1. Verify that the AMI was properly cleaned up: the `/var/lib/cloud/instances/` directory should have only *one* subdirectory (its name should match the id of the launched instance) and the only history in the yum database should be those actions that occured during instance launch (yum history dates should be within minutes of the current system date).
 
     <img alt="AMI-cleanup Check" src="https://cloud.githubusercontent.com/assets/7087031/21895701/a2e19564-d8b1-11e6-9f2a-c881923f207d.png" width="70%" heigt="70%">
 
