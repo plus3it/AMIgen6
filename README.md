@@ -1,4 +1,4 @@
-The scripts in this project are designed to ease the creation of LVM-enabled Enterprise Linux AMIs for use in AWS envrionments. It has been successfully tested with CentOS 6.x, Scientific Linux 6.x and Red Hat Enterprise Linux 6.x. It should work with other EL6-derived operating systems. No testing has been done for any of the EL7-base distributions (though I'm happy to help if you'd like to submit a pull-request so that this project's functionality can be so extended)
+The scripts in this project are designed to ease the creation of LVM-enabled Enterprise Linux 6 AMIs for use in AWS envrionments. It has been successfully tested with CentOS 6.x, Scientific Linux 6.x and Red Hat Enterprise Linux 6.x. It should work with other EL6-derived operating systems. If you are looking for similar functionality for Enterprise Linux 7 distributions, please see [AMIgen7](../../../AMIgen7.git).
 
 Please see the RHEL6 subdirectory for directions/scripts specifically required to leverage this solution for creating license-included RHEL6 AMIs.
 
@@ -21,7 +21,9 @@ Additionally, some scripts have their own explanation files:
 
 If there are any gaps that not covered in these documentation-files, please open an [issue](../../issues).
 
-Extensions planned for the future:
-* Enhancing the EBS-carving routines
-  * Accommodate other than 20GiB root EBS
-  * Accommodate user-driven partition-sizing (note: no plans are in place to include partitions not prescribed by [SCAP guidance](https://fedorahosted.org/scap-security-guide/). It is assumed that non SCAP-prescribed partitioning will primarily be for hosting application-data - and that such data will be segregated from OS data via encapsulation in other than the root LVM2 volume-group)
+**Notes:**
+* Please see the [spel](../../../../plus3it/spel.git) project if you wish to have pre-packaged extended functionality for this project's tool-set. The spel project adds image-creation via Packer and creation of images suitable for Vagrant, VMware and Azure. The spel project also acts as a combined driver for this project and the AMIgen7 peer-project.
+* Extensions planned for the future:
+    * Enhancing the EBS-carving routines
+        * Accommodate other than 20GiB root EBS
+        * Accommodate user-driven partition-sizing (note: no plans are in place to include partitions not prescribed by [SCAP guidance](https://fedorahosted.org/scap-security-guide/). It is assumed that non SCAP-prescribed partitioning will primarily be for hosting application-data - and that such data will be segregated from OS data via encapsulation in other than the root LVM2 volume-group)
