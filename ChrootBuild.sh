@@ -8,10 +8,25 @@ CHROOT="${CHROOT:-/mnt/ec2-root}"
 CONFROOT=$(dirname $0)
 REPORFILEPMS=($(rpm --qf '%{name}\n' -qf /etc/yum.repos.d/* 2>&1 | \
                grep -v "not owned" | sort -u))
+if [[ $(rpm --quiet -q redhat-release-server)$? -eq 0 ]]
+then
+  OSREPOS=(
+     rhui-REGION-client-config-server-6
+     rhui-REGION-rhel-server-releases
+     rhui-REGION-rhel-server-rh-common
+  )
+elif [[ $(rpm --quiet -q centos-release)$? -eq 0 ]]
+then
+  OSREPOS=(
+     base
+     updates
+     extras
+  )
+fi
+DEFAULTREPOS=$(IFS=,; "${OSREPOS[*]}")
+YCM="/bin/yum-config-manager"
 
 function PrepChroot() {
-   local DISABLEREPOS="*media*,*epel*,C*-*"
-
    if [[ ! -e ${CHROOT}/etc/init.d ]]
    then
       ln -t ${CHROOT}/etc -s rc.d/init.d
@@ -21,22 +36,19 @@ function PrepChroot() {
    yumdownloader --destdir=/tmp "${REPORFILEPMS[@]}"
    rpm --root ${CHROOT} --initdb
    rpm --root ${CHROOT} -ivh --nodeps /tmp/*.rpm
-   yum --enablerepo=* --disablerepo=${DISABLEREPOS} --installroot=${CHROOT} \
-      -y reinstall "${REPORFILEPMS[@]}"
+
+   # When we don't specify repos, default to a sensible value-list
+   if [[ -z ${BONUSREPO+xxx} ]]
+   then
+      BONUSREPO=${DEFAULTREPOS}
+   fi
+
+   yum --disablerepo="*" --enablerepo="${BONUSREPO}" \
+      --installroot="${CHROOT}" -y reinstall "${REPORFILEPMS[@]}"
 
    # if alt-repo defined, disable everything, then install alt-repos
    if [[ ! -z ${REPORPMS+xxx} ]]
    then
-      for FILE in ${CHROOT}/etc/yum.repos.d/*.repo
-      do
-         sed -i '{
-	    /^\[/{N
-	       s/\n/&enabled=0\n/
-            }
-	    /^enabled=1/d
-         }' "${FILE}"
-      done
-
       for RPM in ${REPORPMS}
       do
          rpm --root ${CHROOT} -ivh --nodeps "${RPM}"
@@ -116,6 +128,10 @@ then
 else
    YUMCMD="yum --nogpgcheck --installroot=${CHROOT} install -y"
 fi
+
+# Activate repos in the chroot...
+chroot "$CHROOT" "${YCM}" --disable "*"
+chroot "$CHROOT" "${YCM}" --enable "${BONUSREPO}"
 
 # Install main RPM-groups
 ${YUMCMD} @Core -- \
