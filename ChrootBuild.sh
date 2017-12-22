@@ -24,8 +24,8 @@ function PrepChroot() {
    yum --enablerepo=* --disablerepo=${DISABLEREPOS} --installroot=${CHROOT} \
       -y reinstall "${REPORFILEPMS[@]}"
 
-   # if alt-repo defined, disable everything, then install alt-repo
-   if [[ ! -z ${REPORPM+xxx} ]]
+   # if alt-repo defined, disable everything, then install alt-repos
+   if [[ ! -z ${REPORPMS+xxx} ]]
    then
       for FILE in ${CHROOT}/etc/yum.repos.d/*.repo
       do
@@ -36,7 +36,11 @@ function PrepChroot() {
 	    /^enabled=1/d
          }' "${FILE}"
       done
-      rpm --root ${CHROOT} -ivh --nodeps "${REPORPM}"
+
+      for RPM in ${REPORPMS}
+      do
+         rpm --root ${CHROOT} -ivh --nodeps "${RPM}"
+      done
    fi
 }
 
@@ -60,7 +64,7 @@ do
 	       exit 1
 	       ;;
 	    *)
-	       REPORPM=${2}
+	       REPORPMS=($(echo ${2} | sed 's/,/ /g'))
 	       shift 2;
 	       ;;
 	 esac
@@ -108,9 +112,9 @@ PrepChroot
 if [[ ! -z ${BONUSREPO+xxx} ]]
 then
    ENABREPO="--enablerepo=${BONUSREPO}"
-   YUMCMD="yum --nogpgcheck --installroot=${CHROOT} ${ENABREPO} install -y" 
+   YUMCMD="yum --nogpgcheck --installroot=${CHROOT} ${ENABREPO} install -y"
 else
-   YUMCMD="yum --nogpgcheck --installroot=${CHROOT} install -y" 
+   YUMCMD="yum --nogpgcheck --installroot=${CHROOT} install -y"
 fi
 
 # Install main RPM-groups
@@ -140,7 +144,7 @@ yum-utils \
 -libvirt-java \
 -libvirt-java-devel \
 -nc \
--sendmail 
+-sendmail
 
 # Install additionally-requested RPMs
 if [[ ! -z ${EXTRARPMS+xxx} ]]
