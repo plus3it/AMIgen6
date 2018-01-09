@@ -45,6 +45,8 @@ function PrepChroot() {
 
    yum --disablerepo="*" --enablerepo="${BONUSREPO}" \
       --installroot="${CHROOT}" -y reinstall "${REPORFILEPMS[@]}"
+  yum --disablerepo="*" --enablerepo="${BONUSREPO}" \
+     --installroot="${CHROOT}" -y install yum-utils
 
    # if alt-repo defined, disable everything, then install alt-repos
    if [[ ! -z ${REPORPMS+xxx} ]]
