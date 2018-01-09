@@ -23,8 +23,8 @@ then
      extras
   )
 fi
-DEFAULTREPOS=$(IFS=,; "${OSREPOS[*]}")
-YCM="/bin/yum-config-manager"
+DEFAULTREPOS=$(IFS=,; echo "${OSREPOS[*]}")
+YCM="/usr/bin/yum-config-manager"
 
 function PrepChroot() {
    if [[ ! -e ${CHROOT}/etc/init.d ]]
