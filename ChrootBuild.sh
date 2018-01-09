@@ -23,8 +23,8 @@ then
      extras
   )
 fi
-DEFAULTREPOS=$(IFS=,; "${OSREPOS[*]}")
-YCM="/bin/yum-config-manager"
+DEFAULTREPOS=$(IFS=,; echo "${OSREPOS[*]}")
+YCM="/usr/bin/yum-config-manager"
 
 function PrepChroot() {
    if [[ ! -e ${CHROOT}/etc/init.d ]]
@@ -45,6 +45,8 @@ function PrepChroot() {
 
    yum --disablerepo="*" --enablerepo="${BONUSREPO}" \
       --installroot="${CHROOT}" -y reinstall "${REPORFILEPMS[@]}"
+  yum --disablerepo="*" --enablerepo="${BONUSREPO}" \
+     --installroot="${CHROOT}" -y install yum-utils
 
    # if alt-repo defined, disable everything, then install alt-repos
    if [[ ! -z ${REPORPMS+xxx} ]]
