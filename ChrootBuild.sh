@@ -32,6 +32,12 @@ function PrepChroot() {
       ln -t ${CHROOT}/etc -s rc.d/init.d
    fi
 
+   # Enable DNS resolution in the chroot
+   if [[ ! -e ${CHROOT}/etc/resolv.conf ]]
+   then
+      install -m 0644 /etc/resolv.conf "${CHROOT}/etc"
+   fi
+
    yumdownloader --destdir=/tmp $(rpm --qf '%{name}\n' -qf /etc/redhat-release)
    yumdownloader --destdir=/tmp "${REPORFILEPMS[@]}"
    rpm --root ${CHROOT} --initdb
