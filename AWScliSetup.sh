@@ -13,7 +13,7 @@
 SCRIPTROOT="$(dirname ${0})"
 CHROOT="${CHROOT:-/mnt/ec2-root}"
 BUNDLE="awscli-bundle.zip"
-ZIPSRC="${1:-https://s3.amazonaws.com/aws-cli}"
+ZIPSRC="${1:-https://s3.amazonaws.com/aws-cli/awscli-bundle.zip}"
 EPELRELEASE="${2:-https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm}"
 AWSZIP="/tmp/${BUNDLE}"
 
@@ -32,7 +32,7 @@ fi
 
 # Bail if bogus location for ZIP
 printf "Fetching ${BUNDLE} from ${ZIPSRC}..."
-(cd /tmp ; curl -sL "${ZIPSRC}/${BUNDLE}" -o ${BUNDLE})
+(cd /tmp ; curl -sL "${ZIPSRC}" -o ${BUNDLE})
 echo
 
 if [[ ! -f "${AWSZIP}" ]]
@@ -44,7 +44,7 @@ then
    echo "${AWSZIP} is not a ZIP-archive. Aborting..." > /dev/stderr
    exit 1
 else
-   echo "Downloaded ${ZIPSRC}/${BUNDLE} to ${AWSZIP}."
+   echo "Downloaded ${ZIPSRC} to ${AWSZIP}."
 fi
 
 # Unzip the AWScli bundle into /tmp
